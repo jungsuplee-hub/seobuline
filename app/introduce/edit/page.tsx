@@ -12,11 +12,13 @@ export default async function EditIntroducePage() {
   const site = await getSiteContent();
   const projectOverview = site.projectOverview;
   const imageValue = (projectOverview as { hero_image_url?: string | null }).hero_image_url || "";
+  const imagePosition = (projectOverview as { hero_image_position?: string | null }).hero_image_position || "center center";
 
   return (
     <div className="space-y-3">
       <h1 className="text-2xl font-bold">소개 수정</h1>
       <form action="/api/site-content" method="post" className="space-y-3">
+        <input type="hidden" name="section" value="introduce" />
         <div className="space-y-2 rounded border border-[#d0a453]/35 p-4">
           <h2 className="font-semibold text-[#f6d794]">히어로/상세 섹션</h2>
           <label className="block text-sm">상세 설명</label>
@@ -38,6 +40,16 @@ export default async function EditIntroducePage() {
         </div>
 
         <AdminImageInput scope="site" defaultUrl={imageValue} />
+        <div className="space-y-2 rounded border border-[#d0a453]/35 p-4">
+          <label className="block text-sm font-semibold text-[#f6d794]">소개 상단 이미지 위치</label>
+          <select name="image_position" defaultValue={imagePosition} className="w-full rounded border border-[#d0a453]/40 bg-[#0f1520] px-3 py-2">
+            <option value="center center">가운데</option>
+            <option value="top center">위쪽</option>
+            <option value="bottom center">아래쪽</option>
+            <option value="center left">왼쪽</option>
+            <option value="center right">오른쪽</option>
+          </select>
+        </div>
         <div className="flex gap-2">
           <button className="rounded bg-[#d0a453] px-3 py-2 font-semibold text-[#1e1610]">저장</button>
           <Link href="/introduce" className="rounded border px-3 py-2">취소</Link>

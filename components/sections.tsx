@@ -3,34 +3,40 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getPoliticianItems, getTimelineItems } from "@/lib/content-store";
+import { getPoliticianItems, getSiteContent, getTimelineItems } from "@/lib/content-store";
 import { getNews } from "@/lib/news-store";
 import { notices } from "@/lib/public-data";
 import { db } from "@/lib/db";
 
 const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
 
-export function HeroSection() {
+export async function HeroSection() {
+  const { homeHero } = await getSiteContent();
+  const heroTitleLines = homeHero.title.split("\n").filter(Boolean);
+
   return (
     <section className="relative overflow-hidden rounded-2xl border border-[#d0a453]/25">
       <Image
-        src="/assets/hero-campaign.svg"
+        src={homeHero.image_url || "/assets/hero-campaign.svg"}
         alt="서부권 교통 캠페인 비주얼"
         width={1600}
         height={900}
         className="h-[460px] w-full object-cover"
+        style={{ objectPosition: homeHero.image_position || "center center" }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-[#090d14]/95 via-[#090d14]/75 to-[#090d14]/40" />
       <div className="absolute inset-0 p-8 md:p-12">
-        <Badge>공공 캠페인 아카이브</Badge>
+        <Badge>{homeHero.badge}</Badge>
         <h1 className="mt-4 max-w-3xl text-3xl font-bold leading-tight md:text-5xl">
-          서부선 정상화로,
-          <br />
-          서부권의 출퇴근과 생활권 연결을 되찾겠습니다.
+          {heroTitleLines.map((line, index) => (
+            <span key={`${line}-${index}`}>
+              {line}
+              {index < heroTitleLines.length - 1 && <br />}
+            </span>
+          ))}
         </h1>
         <p className="mt-4 max-w-2xl text-sm text-[#e8dcc9] md:text-base">
-          서부선은 은평·서대문·마포·영등포·동작·관악을 잇는 핵심 연결축입니다. 공개 출처로
-          확인된 사실만 정리해 주민 참여와 정책 감시를 돕습니다.
+          {homeHero.description}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button href="/route-map">예상노선도 보기</Button>

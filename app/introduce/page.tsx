@@ -37,6 +37,7 @@ export default async function IntroducePage() {
           width={1400}
           height={760}
           className="h-[320px] w-full object-cover"
+          style={{ objectPosition: (projectOverview as { hero_image_position?: string | null }).hero_image_position || "center center" }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#090d14]/95 via-[#090d14]/65 to-[#090d14]/40" />
         <div className="absolute inset-0 p-7 md:p-10">

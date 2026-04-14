@@ -1,1 +1,0 @@
-*/30 * * * * cd /opt/seobuline && /usr/bin/npm run news:sync >> /var/log/seobuline-news-sync.log 2>&1

@@ -8,7 +8,6 @@
 - API Route Handler CRUD 골격 + Zod 검증 + sanitize
 - Supabase SQL 스키마(요청 테이블/인덱스/RLS) 및 seed 스크립트
 - 반응형 UI, 404/권한없음/로딩/에러 페이지
-- 뉴스 초기 데이터(`data/news.json`) + RSS 기반 자동 수집 스크립트
 
 ## 설치
 ```bash
@@ -18,13 +17,6 @@ npm install
 ## 환경변수
 ```bash
 cp .env.example .env.local
-```
-
-### 뉴스 수집 관련(선택)
-```bash
-# 기본값: Google News "서부선 지하철" RSS
-NEWS_RSS_URL=https://news.google.com/rss/search?q=서부선+지하철&hl=ko&gl=KR&ceid=KR:ko
-NEWS_MAX_ITEMS=50
 ```
 
 ## Supabase 설정
@@ -44,44 +36,6 @@ npm run db:seed
 npm run dev
 ```
 - 포트: `5050`
-
-## 뉴스 자동 업데이트
-### 수동 실행
-```bash
-npm run news:sync
-```
-
-### cron 등록 (서버)
-`deploy/cron/news-sync.cron` 예시를 crontab에 등록하면 30분마다 뉴스를 업데이트합니다.
-
-```bash
-crontab -e
-# 아래 1줄 추가
-*/30 * * * * cd /opt/seobuline && /usr/bin/npm run news:sync >> /var/log/seobuline-news-sync.log 2>&1
-```
-
-## systemctl 실행
-아래 파일을 `/etc/systemd/system`으로 복사해서 사용하세요.
-
-- `deploy/systemd/seobuline.service`: Next.js 앱 구동
-- `deploy/systemd/seobuline-news-sync.service`: 뉴스 수집 작업
-- `deploy/systemd/seobuline-news-sync.timer`: 30분 주기 실행
-
-```bash
-sudo cp deploy/systemd/seobuline.service /etc/systemd/system/
-sudo cp deploy/systemd/seobuline-news-sync.service /etc/systemd/system/
-sudo cp deploy/systemd/seobuline-news-sync.timer /etc/systemd/system/
-
-sudo systemctl daemon-reload
-sudo systemctl enable --now seobuline.service
-sudo systemctl enable --now seobuline-news-sync.timer
-
-# 상태 확인
-systemctl status seobuline.service
-systemctl status seobuline-news-sync.timer
-```
-
-> 서비스 파일의 `WorkingDirectory`, `User`, `Group`, `ExecStart`는 실제 서버 환경에 맞춰 수정하세요.
 
 ## 관리자 계정 시나리오
 1. 일반 사용자 가입

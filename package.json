@@ -9,8 +9,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:migrate": "supabase db reset",
-    "db:seed": "tsx supabase/seed.ts",
-    "news:sync": "tsx scripts/sync-news.ts"
+    "db:seed": "tsx supabase/seed.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

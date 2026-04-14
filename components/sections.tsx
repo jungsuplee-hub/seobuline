@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getNews } from "@/lib/news-store";
 import { notices, politicianItems, timelineItems } from "@/lib/public-data";
-import { posts } from "@/lib/mock-data";
+import { db } from "@/lib/db";
 
 const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
 
@@ -85,13 +85,14 @@ export function NeedSection() {
 
 export async function HomeLists() {
   const news = await getNews();
+  const latestPosts = db.prepare("SELECT id, title FROM posts WHERE is_deleted = 0 ORDER BY created_at DESC LIMIT 5").all() as Array<{ id: number; title: string }>;
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Card><h2 className="font-semibold">진행현황 요약</h2><ul className="mt-3 space-y-2 text-sm">{timelineItems.slice(0,4).map((item)=><li key={item.title}>{item.status} · {item.title}</li>)}</ul></Card>
       <Card><h2 className="font-semibold">최신 뉴스</h2><ul className="mt-3 space-y-2 text-sm">{news.slice(0,5).map((n)=><li key={n.id}>{n.published_date} · {n.title}</li>)}</ul></Card>
       <Card><h2 className="font-semibold">최근 공지</h2><ul className="mt-3 space-y-2 text-sm">{notices.slice(0,3).map((n)=><li key={n.id}>{n.title}</li>)}</ul></Card>
-      <Card><h2 className="font-semibold">게시판 최신글</h2><ul className="mt-3 space-y-2 text-sm">{posts.slice(0,5).map((p)=><li key={p.id}>{p.title}</li>)}</ul></Card>
+      <Card><h2 className="font-semibold">게시판 최신글</h2><ul className="mt-3 space-y-2 text-sm">{latestPosts.map((p)=><li key={p.id}>{p.title}</li>)}</ul></Card>
     </div>
   );
 }

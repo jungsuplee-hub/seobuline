@@ -42,6 +42,19 @@ npm run db:init
 
 > 앱 구동 시에도 DB 초기화가 자동 수행됩니다.
 
+### 관리자 이메일(role) 강제 보정
+- 관리자 이메일 목록은 `lib/auth-config.ts`의 `ADMIN_EMAILS`로 관리합니다.
+- 앱 시작(DB 초기화) 시 `ADMIN_EMAILS`와 일치하는 `users.email` 계정은 `role='admin'`으로 자동 보정됩니다.
+- 로그인 시에도 해당 이메일 계정이 `admin`이 아니면 즉시 `admin`으로 동기화됩니다.
+
+운영 중 수동 보정이 필요하면 아래 SQL을 실행하세요.
+
+```sql
+UPDATE users
+SET role = 'admin'
+WHERE lower(trim(email)) = '4728740@hanmail.net';
+```
+
 ## 로컬 실행
 ```bash
 npm run dev

@@ -42,6 +42,11 @@ export async function Header() {
               <Link href="/mypage" className="hover:text-[#f7d899]">
                 마이페이지
               </Link>
+              {(user.role === "admin" || user.role === "moderator") && (
+                <Link href="/admin" className="hover:text-[#f7d899]">
+                  관리자
+                </Link>
+              )}
               <form action="/api/auth/logout" method="post">
                 <button className="hover:text-[#f7d899]" type="submit">
                   로그아웃

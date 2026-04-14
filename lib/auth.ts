@@ -2,6 +2,7 @@ import { randomBytes, createHmac } from "node:crypto";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
+import { isAdminEmail, normalizeEmail } from "@/lib/auth-config";
 import { db } from "@/lib/db";
 
 export type Role = "user" | "moderator" | "admin";
@@ -99,10 +100,16 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     return null;
   }
 
+  let role: Role = session.role || "user";
+  if (isAdminEmail(session.email) && role !== "admin") {
+    db.prepare("UPDATE users SET role = 'admin', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(session.user_id);
+    role = "admin";
+  }
+
   return {
     id: session.user_id,
     email: session.email,
-    role: session.role || "user",
+    role,
     region: session.region,
     nickname: session.nickname,
   };
@@ -123,5 +130,18 @@ export async function requireAdmin(nextPath = "/") {
 }
 
 export function validateEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
+}
+
+export function getRoleForEmail(email: string): Role {
+  return isAdminEmail(email) ? "admin" : "user";
+}
+
+export function ensureAdminRoleForUser(userId: number, email: string, role: Role) {
+  if (!isAdminEmail(email) || role === "admin") {
+    return role;
+  }
+
+  db.prepare("UPDATE users SET role = 'admin', updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(userId);
+  return "admin";
 }

@@ -217,6 +217,7 @@ export function initDb() {
   addColumnIfMissing("resources", "file_url", "file_url TEXT");
   addColumnIfMissing("resources", "published_date", "published_date TEXT");
   addColumnIfMissing("site_content", "route_map_image_url", "route_map_image_url TEXT");
+  addColumnIfMissing("site_content", "introduce_sections_json", "introduce_sections_json TEXT");
 
   db.prepare(
     `INSERT INTO site_stats (key, value, updated_at)

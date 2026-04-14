@@ -1,8 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { timelineItems } from "@/lib/public-data";
+import { getTimelineItems } from "@/lib/content-store";
 
-export default function StatusPage() {
+export const dynamic = "force-dynamic";
+
+export default async function StatusPage() {
+  const timelineItems = await getTimelineItems();
+
   return (
     <div>
       <h1 className="mb-4 text-2xl font-bold">진행현황</h1>
@@ -16,7 +20,7 @@ export default function StatusPage() {
             <p className="mt-1 text-sm">{item.description}</p>
             <p className="mt-1 text-xs text-slate-500">{item.timeline_date}</p>
             <p className="mt-1 text-xs text-slate-500">
-              출처: {item.source_name} · 기준일: {item.reference_date} · {" "}
+              출처: {item.source_name} · 기준일: {item.reference_date} ·{" "}
               <a href={item.source_url} className="underline" target="_blank" rel="noreferrer">
                 원문
               </a>

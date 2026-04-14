@@ -1,7 +1,11 @@
 import { Card } from "@/components/ui/card";
-import { faqItems, projectOverview } from "@/lib/public-data";
+import { getSiteContent } from "@/lib/content-store";
 
-export default function IntroducePage() {
+export const dynamic = "force-dynamic";
+
+export default async function IntroducePage() {
+  const { projectOverview, faqItems } = await getSiteContent();
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">서부선 소개</h1>
@@ -49,7 +53,7 @@ export default function IntroducePage() {
               <strong>{f.question}</strong>
               <p className="mt-1">{f.answer}</p>
               <p className="mt-1 text-xs text-slate-500">
-                출처: {f.source_name} · 기준일: {f.reference_date} · {" "}
+                출처: {f.source_name} · 기준일: {f.reference_date} ·{" "}
                 <a href={f.source_url} className="underline" target="_blank" rel="noreferrer">
                   원문
                 </a>
@@ -64,7 +68,7 @@ export default function IntroducePage() {
         <ul className="mt-2 space-y-2 text-sm">
           {projectOverview.sources.map((source) => (
             <li key={source.source_url}>
-              {source.source_name} (기준일: {source.reference_date}) · {" "}
+              {source.source_name} (기준일: {source.reference_date}) ·{" "}
               <a href={source.source_url} className="underline" target="_blank" rel="noreferrer">
                 링크
               </a>

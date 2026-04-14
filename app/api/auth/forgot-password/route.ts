@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateResetToken, validateEmail } from "@/lib/auth";
+import { buildAbsoluteUrl } from "@/lib/request";
 
 const RESET_TTL_MS = 1000 * 60 * 30;
 
@@ -23,8 +24,7 @@ export async function POST(req: Request) {
   db.prepare("UPDATE password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE user_id = ? AND used_at IS NULL").run(user.id);
   db.prepare("INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)").run(user.id, token, expiresAt);
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
-  const resetLink = `${origin}/reset-password?token=${encodeURIComponent(token)}`;
+  const resetLink = buildAbsoluteUrl(`/reset-password?token=${encodeURIComponent(token)}`, req);
 
   console.log("[password-reset]", { email, resetLink, expiresAt });
 

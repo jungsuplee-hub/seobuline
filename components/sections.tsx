@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getPoliticianItems, getTimelineItems } from "@/lib/content-store";
 import { getNews } from "@/lib/news-store";
-import { notices, politicianItems, timelineItems } from "@/lib/public-data";
+import { notices } from "@/lib/public-data";
 import { db } from "@/lib/db";
 
 const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
@@ -68,9 +69,6 @@ export async function HomeGrid({ userCount, homeViewCount }: { userCount: number
 export function NeedSection() {
   return (
     <section className="grid gap-4 lg:grid-cols-2">
-      <Card className="overflow-hidden p-0">
-        <Image src="/assets/network-map.svg" alt="서부권 연결 시각화" width={1400} height={900} className="h-full w-full object-cover" />
-      </Card>
       <Card>
         <h2 className="text-2xl font-semibold">왜 서부선이 필요한가</h2>
         <p className="mt-2 text-sm text-[#decfb8]">서울 서부권은 방사형 중심 철도망에서 상대적으로 소외되어, 업무지구 접근 시 환승과 우회 이동 부담이 큽니다.</p>
@@ -80,12 +78,22 @@ export function NeedSection() {
           <li><strong>GBD</strong> 강남권 출퇴근 시 2·7·9호선 연계 효율 개선</li>
         </ul>
       </Card>
+      <Card>
+        <h2 className="text-xl font-semibold">운영 원칙</h2>
+        <ul className="mt-4 space-y-3 text-sm text-[#dfcfb5]">
+          <li>• 뉴스/정치인/진행현황은 공개 출처와 수동 검수 데이터 중심으로 갱신합니다.</li>
+          <li>• 루머/비공식 자료를 배제하고 원문 링크를 함께 제공합니다.</li>
+          <li>• 오픈채팅·게시판을 통해 주민 제보를 수집하고 사실 확인 후 반영합니다.</li>
+        </ul>
+      </Card>
     </section>
   );
 }
 
 export async function HomeLists() {
   const news = await getNews();
+  const timelineItems = await getTimelineItems();
+  const politicianItems = await getPoliticianItems();
   const latestPosts = db.prepare("SELECT id, title FROM posts WHERE is_deleted = 0 ORDER BY created_at DESC LIMIT 5").all() as Array<{ id: number; title: string }>;
 
   return (

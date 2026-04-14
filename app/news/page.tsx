@@ -17,7 +17,11 @@ export default async function NewsPage() {
         <h1 className="text-2xl font-bold">뉴스/기사 아카이브</h1>
         {canManage && <Link href="/news/new" className="rounded bg-[#d0a453] px-3 py-2 text-sm font-semibold text-[#1e1610]">새 뉴스 등록</Link>}
       </div>
-      {deduped.map((n) => (
+      {deduped.length === 0 ? (
+        <Card>
+          <p className="text-sm text-slate-300">아직 등록된 뉴스가 없습니다. 관리자라면 오른쪽 상단의 새 뉴스 등록 버튼으로 첫 기사를 추가하세요.</p>
+        </Card>
+      ) : deduped.map((n) => (
         <Card key={n.id}>
           {n.image_url && <img src={n.image_url} alt="뉴스 이미지" className="mb-2 h-40 w-full rounded object-cover" />}
           <Link href={`/news/${n.id}`} className="font-semibold hover:text-[#f7d899]">{n.title}</Link>

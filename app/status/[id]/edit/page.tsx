@@ -11,6 +11,7 @@ export default async function EditStatusPage({ params }: { params: Promise<{ id:
   const { id } = await params;
   const event = db.prepare("SELECT * FROM timeline_items WHERE id = ?").get(id) as any;
   if (!event) redirect("/status");
+  const timelineDateValue = String(event.timeline_date || "").slice(0, 10);
 
   return (
     <div className="space-y-3">
@@ -20,7 +21,7 @@ export default async function EditStatusPage({ params }: { params: Promise<{ id:
         <input name="title" defaultValue={event.title} className="w-full" required />
         <textarea name="description" defaultValue={event.description} className="min-h-24 w-full" required />
         <input name="status" defaultValue={event.status} className="w-full" required />
-        <input type="date" name="timeline_date" defaultValue={event.timeline_date} className="w-full" required />
+        <input type="date" name="timeline_date" defaultValue={timelineDateValue} className="w-full" required />
         <input name="source_name" defaultValue={event.source_name || ""} className="w-full" placeholder="출처명" />
         <input name="source_url" defaultValue={event.source_url || ""} className="w-full" placeholder="출처 URL" />
         <input type="number" name="sort_order" defaultValue={event.sort_order} className="w-full" />

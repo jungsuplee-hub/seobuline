@@ -25,6 +25,10 @@ export default async function NewPoliticianPage() {
         <input name="x_url" placeholder="X URL" className="w-full" />
         <input name="blog_url" placeholder="블로그 URL" className="w-full" />
         <input name="office_phone" placeholder="대표 전화" className="w-full" />
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="is_visible" value="1" defaultChecked />
+          공개 상태
+        </label>
         <AdminImageInput scope="politicians" />
         <button className="rounded bg-[#d0a453] px-3 py-2 font-semibold text-[#1e1610]">등록</button>
       </form>

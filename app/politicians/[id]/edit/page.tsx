@@ -31,6 +31,10 @@ export default async function EditPoliticianPage({ params }: { params: Promise<{
         <input name="x_url" defaultValue={p.x_url || ""} className="w-full" />
         <input name="blog_url" defaultValue={p.blog_url || ""} className="w-full" />
         <input name="office_phone" defaultValue={p.office_phone || ""} className="w-full" />
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="is_visible" value="1" defaultChecked={Boolean(p.is_visible ?? 1)} />
+          공개 상태
+        </label>
         <AdminImageInput scope="politicians" defaultUrl={p.image_url || ""} />
         <div className="flex gap-2">
           <button className="rounded bg-[#d0a453] px-3 py-2 font-semibold text-[#1e1610]">수정 저장</button>

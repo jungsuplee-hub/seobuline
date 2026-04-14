@@ -13,6 +13,7 @@ export async function POST(req: Request) {
   const aboutContent = String(form.get("about_content") || "").trim();
   const imageUrl = String(form.get("image_url") || "").trim() || null;
 
+  db.prepare("INSERT INTO site_content (id, about_content, image_url) VALUES (1, '', NULL) ON CONFLICT(id) DO NOTHING").run();
   db.prepare("UPDATE site_content SET about_content = ?, image_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1").run(aboutContent, imageUrl);
 
   return redirectWithForwardedHeaders(req, "/introduce");

@@ -18,8 +18,16 @@ export default function AdminImageInput({ scope, name, defaultUrl }: { scope: st
       fd.append("file", file);
       fd.append("scope", scope);
       const res = await fetch("/api/uploads", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "업로드 실패");
+      const text = await res.text();
+      let data: { ok?: boolean; url?: string; error?: string } = {};
+      if (text) {
+        try {
+          data = JSON.parse(text) as { ok?: boolean; url?: string; error?: string };
+        } catch {
+          throw new Error("업로드 응답을 해석하지 못했습니다.");
+        }
+      }
+      if (!res.ok || !data.url) throw new Error(data.error || "업로드 실패");
       setNewUrl(data.url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "업로드 실패");

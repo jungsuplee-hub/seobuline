@@ -12,9 +12,10 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   const form = await req.formData();
+  const isVisible = String(form.get("is_visible") || "") === "1" ? 1 : 0;
   db.prepare(`UPDATE politicians SET
     name=?, party=?, district=?, office_type=?, region_tags=?, summary=?, stance_or_relevance=?, election_2026_status=?,
-    source_name=?, source_url=?, official_website=?, x_url=?, blog_url=?, office_phone=?, image_url=?
+    source_name=?, source_url=?, official_website=?, x_url=?, blog_url=?, office_phone=?, image_url=?, is_visible=?
     WHERE id=?`).run(
     String(form.get("name") || "").trim(),
     String(form.get("party") || "").trim(),
@@ -31,6 +32,7 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
     String(form.get("blog_url") || "").trim() || null,
     String(form.get("office_phone") || "").trim() || null,
     String(form.get("image_url") || "").trim() || null,
+    isVisible,
     id,
   );
   return redirectWithForwardedHeaders(req, "/politicians");

@@ -71,7 +71,7 @@ export async function getPoliticianItems() {
     blog_url: row.blog_url ? String(row.blog_url) : null,
     office_phone: row.office_phone ? String(row.office_phone) : null,
     review_status: "approved",
-    is_visible: true,
+    is_visible: Number(row.is_visible ?? 1) === 1,
     updated_at: new Date().toISOString().slice(0, 10),
     image_url: row.image_url ? String(row.image_url) : null,
   }));

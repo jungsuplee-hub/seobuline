@@ -13,13 +13,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const form = await req.formData();
   const fileUrl = String(form.get("file_url") || "").trim();
+  const uploadedAttachmentUrl = String(form.get("thumbnail_url") || "").trim();
+  const resolvedUrl = fileUrl || uploadedAttachmentUrl;
   db.prepare("UPDATE resources SET title=?, url=?, file_url=?, description=?, category=?, thumbnail_url=?, published_date=? WHERE id=?").run(
     String(form.get("title") || "").trim(),
-    fileUrl,
-    fileUrl,
+    resolvedUrl,
+    resolvedUrl,
     String(form.get("description") || "").trim() || null,
     String(form.get("category") || "").trim(),
-    String(form.get("thumbnail_url") || "").trim() || null,
+    uploadedAttachmentUrl || null,
     String(form.get("published_date") || "").trim() || null,
     id,
   );

@@ -19,10 +19,17 @@ export default async function EditResourcePage({ params }: { params: Promise<{ i
         <input type="hidden" name="_method" value="PATCH" />
         <input name="title" defaultValue={r.title} className="w-full" required />
         <textarea name="description" defaultValue={r.description || ""} className="min-h-24 w-full" />
-        <input name="file_url" defaultValue={r.file_url || r.url} className="w-full" required />
+        <input name="file_url" type="url" defaultValue={r.file_url || r.url} className="w-full" placeholder="링크 URL (선택)" />
         <input name="category" defaultValue={r.category || ""} className="w-full" />
         <input type="date" name="published_date" defaultValue={r.published_date || ""} className="w-full" />
-        <AdminImageInput scope="resources" name="thumbnail_url" defaultUrl={r.thumbnail_url || ""} />
+        <AdminImageInput
+          scope="resources"
+          name="thumbnail_url"
+          defaultUrl={r.thumbnail_url || ""}
+          accept="image/*,.pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.json"
+          currentLabel="현재 첨부 파일"
+          uploadLabel="새 첨부 업로드 (이미지/파일, 선택)"
+        />
         <div className="flex gap-2">
           <button className="rounded bg-[#d0a453] px-3 py-2 font-semibold text-[#1e1610]">수정 저장</button>
           <Link href="/resources" className="rounded border px-3 py-2">취소</Link>

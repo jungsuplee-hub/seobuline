@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { saveUploadedImage } from "@/lib/upload";
+import { saveUploadedFile } from "@/lib/upload";
 
 const ADMIN_SCOPES = new Set(["news", "notices", "politicians", "resources", "site", "timeline", "route-map"]);
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       return jsonError("허용되지 않은 업로드 타입입니다.", 400);
     }
 
-    const url = await saveUploadedImage(file as File, scope);
+    const url = await saveUploadedFile(file as File, scope);
     return new NextResponse(JSON.stringify({ ok: true, url }), { status: 200, headers: JSON_HEADERS });
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "업로드 실패", 400);

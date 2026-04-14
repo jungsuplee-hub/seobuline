@@ -8,6 +8,13 @@ const DATA_DIR = path.join(process.cwd(), "data");
 export interface SiteContent {
   projectOverview: typeof projectOverview;
   faqItems: typeof faqItems;
+  homeHero: {
+    badge: string;
+    title: string;
+    description: string;
+    image_url: string;
+    image_position: string;
+  };
 }
 
 type IntroduceSectionOverrides = Partial<{
@@ -17,7 +24,25 @@ type IntroduceSectionOverrides = Partial<{
   추진_background: string[];
   major_stations_or_sections: string[];
   expected_effects: string[];
+  hero_image_position: string;
 }>;
+
+type HomeSectionOverrides = Partial<{
+  badge: string;
+  title: string;
+  description: string;
+  image_url: string;
+  image_position: string;
+}>;
+
+const defaultHomeHero = {
+  badge: "공공 캠페인 아카이브",
+  title: "서부선 정상화로,\n서부권의 출퇴근과 생활권 연결을 되찾겠습니다.",
+  description:
+    "서부선은 은평·서대문·마포·영등포·동작·관악을 잇는 핵심 연결축입니다. 공개 출처로 확인된 사실만 정리해 주민 참여와 정책 감시를 돕습니다.",
+  image_url: "/assets/hero-campaign.svg",
+  image_position: "center center",
+};
 
 export interface TimelineItem {
   id?: number;
@@ -41,9 +66,9 @@ async function readJsonFile<T>(fileName: string, fallback: T): Promise<T> {
 }
 
 export async function getSiteContent(): Promise<SiteContent> {
-  const base = await readJsonFile<SiteContent>("site-content.json", { projectOverview, faqItems });
-  const row = db.prepare("SELECT about_content, image_url, introduce_sections_json FROM site_content WHERE id = 1").get() as
-    | { about_content: string | null; image_url: string | null; introduce_sections_json: string | null }
+  const base = await readJsonFile<SiteContent>("site-content.json", { projectOverview, faqItems, homeHero: defaultHomeHero });
+  const row = db.prepare("SELECT about_content, image_url, introduce_sections_json, home_sections_json FROM site_content WHERE id = 1").get() as
+    | { about_content: string | null; image_url: string | null; introduce_sections_json: string | null; home_sections_json: string | null }
     | undefined;
   if (!row) return base;
 
@@ -54,6 +79,15 @@ export async function getSiteContent(): Promise<SiteContent> {
       sectionOverrides = parsed;
     } catch {
       sectionOverrides = {};
+    }
+  }
+  let homeOverrides: HomeSectionOverrides = {};
+  if (row.home_sections_json?.trim()) {
+    try {
+      const parsed = JSON.parse(row.home_sections_json) as HomeSectionOverrides;
+      homeOverrides = parsed;
+    } catch {
+      homeOverrides = {};
     }
   }
 
@@ -77,6 +111,16 @@ export async function getSiteContent(): Promise<SiteContent> {
         ? sectionOverrides.expected_effects
         : base.projectOverview.expected_effects,
       hero_image_url: mergedHeroImageUrl,
+      hero_image_position: sectionOverrides.hero_image_position?.trim() || "center center",
+    },
+    homeHero: {
+      ...defaultHomeHero,
+      ...(base.homeHero || {}),
+      badge: homeOverrides.badge?.trim() || base.homeHero?.badge || defaultHomeHero.badge,
+      title: homeOverrides.title?.trim() || base.homeHero?.title || defaultHomeHero.title,
+      description: homeOverrides.description?.trim() || base.homeHero?.description || defaultHomeHero.description,
+      image_url: homeOverrides.image_url?.trim() || base.homeHero?.image_url || defaultHomeHero.image_url,
+      image_position: homeOverrides.image_position?.trim() || base.homeHero?.image_position || defaultHomeHero.image_position,
     },
   } as SiteContent;
 }

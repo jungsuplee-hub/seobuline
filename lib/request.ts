@@ -21,6 +21,10 @@ export function getAppBaseUrl(req?: Request) {
   const host = forwardedHost || req.headers.get("host") || url.host;
   const forwardedPort = req.headers.get("x-forwarded-port")?.split(",")[0]?.trim();
 
+  if (forwardedHost) {
+    return `${proto}://${forwardedHost}`;
+  }
+
   if (!forwardedPort || host.includes(":")) {
     return `${proto}://${host}`;
   }

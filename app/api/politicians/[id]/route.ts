@@ -5,7 +5,7 @@ import { redirectWithForwardedHeaders } from "@/lib/request";
 
 async function checkAdmin() {
   const user = await getCurrentUser();
-  return Boolean(user && (user.role === "admin" || user.role === "moderator" || user.role === "manager"));
+  return Boolean(user && (user.role === "admin" || user.role === "manager"));
 }
 
 export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){

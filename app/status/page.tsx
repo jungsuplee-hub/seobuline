@@ -23,7 +23,7 @@ export default async function StatusPage() {
           <Card key={`${item.timeline_date}-${item.title}`}>
             <div className="flex justify-between gap-2">
               <h2 className="font-semibold">{item.title}</h2>
-              {canManage && item.id ? <Link href={`/status/${item.id}/edit`} className="rounded border px-2 py-1 text-xs">수정</Link> : null}
+              {canManage && item.id ? <Link href={`/timeline/${item.id}/edit`} className="rounded border px-2 py-1 text-xs">수정</Link> : null}
             </div>
             <div className="mt-1"><Badge>{item.status}</Badge></div>
             <p className="mt-2 text-sm">{item.description}</p>

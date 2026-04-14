@@ -1,0 +1,53 @@
+{
+  "projectOverview": {
+    "title": "서울 경전철 서부선(민간투자사업)",
+    "business_summary": "서부선은 은평구 새절역(6호선)부터 관악구 서울대입구역(2호선)까지 서울 서북·서남권을 잇는 도시철도 사업입니다.",
+    "추진_background": [
+      "서북·서남권은 환승 우회와 버스 혼잡 부담이 크다는 지적이 반복되어 왔습니다.",
+      "총사업비·실시협약 조정 과정에서 일정 변동이 있어 지속적인 공개 정보 점검이 필요합니다."
+    ],
+    "route_overview": "새절·명지대·신촌·여의도·장승배기·서울대입구권을 잇는 서부권 횡축 노선으로 소개됩니다.",
+    "major_stations_or_sections": [
+      "새절역(6호선) – 명지대권 – 신촌권 – 여의도권 – 장승배기권 – 서울대입구역(2호선)",
+      "공개 문서 기준 정거장 16개소, 차량기지 1개소"
+    ],
+    "expected_effects": [
+      "서부권 통행시간 단축과 혼잡 완화",
+      "YBD·CBD·GBD 접근성 개선을 위한 환승 선택지 확대",
+      "지역 생활권·상권 연결성 향상 기대"
+    ],
+    "resident_perspective_summary": "주민 관점 핵심은 착공 시점, 사업 재원 안정성, 공사 단계 불편 최소화, 환승 동선 실효성입니다.",
+    "sources": [
+      {
+        "source_name": "서울시보(2022-09-08)",
+        "source_url": "https://event.seoul.go.kr/snews/data/CN_MST/seoulsibo_20220907175540_11344.pdf",
+        "reference_date": "2026-04-14"
+      },
+      {
+        "source_name": "서울시 오픈거버넌스 보도자료(2024-12-18)",
+        "source_url": "https://opengov.seoul.go.kr/press/32463683",
+        "reference_date": "2026-04-14"
+      }
+    ]
+  },
+  "faqItems": [
+    {
+      "question": "서부선은 어디에서 어디까지 연결되나요?",
+      "answer": "서울시보 고시 기준 은평구 새절역(6호선)부터 관악구 서울대입구역(2호선)까지입니다.",
+      "sort_order": 1,
+      "is_visible": true,
+      "source_url": "https://event.seoul.go.kr/snews/data/CN_MST/seoulsibo_20220907175540_11344.pdf",
+      "source_name": "서울시보",
+      "reference_date": "2026-04-14"
+    },
+    {
+      "question": "최근 사업 단계는 어떤 상태인가요?",
+      "answer": "공개 보도 기준 진행단계 변동이 있어, 최신 기사 및 공문 기준으로 정기 업데이트합니다.",
+      "sort_order": 2,
+      "is_visible": true,
+      "source_url": "https://www.asiae.co.kr/article/economic-general/2026033117250171909",
+      "source_name": "아시아경제",
+      "reference_date": "2026-04-14"
+    }
+  ]
+}

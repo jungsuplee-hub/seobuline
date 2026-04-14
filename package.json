@@ -9,7 +9,12 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "news:sync": "tsx scripts/sync-news.ts",
-    "db:init": "tsx scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "update:news": "tsx scripts/update-news.ts",
+    "update:politicians": "tsx scripts/update-politicians.ts",
+    "update:timeline": "tsx scripts/update-timeline.ts",
+    "update:site-content": "tsx scripts/update-site-content.ts",
+    "update:all": "tsx scripts/run-all-updates.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -1,0 +1,22 @@
+[
+  {
+    "title": "서부선 실시협약(안) 민투심 통과 발표",
+    "description": "서울시 보도자료에서 실시협약(안) 심의 통과를 발표했습니다.",
+    "timeline_date": "2024-12-18",
+    "status": "심의 통과",
+    "sort_order": 2,
+    "source_url": "https://opengov.seoul.go.kr/press/32463683",
+    "source_name": "서울시",
+    "reference_date": "2026-04-14"
+  },
+  {
+    "title": "서울시, 서부선 도시철도 민간투자사업 지정 고시",
+    "description": "사업위치(새절역~서울대입구역), 규모(정거장 16개소) 등이 기재됐습니다.",
+    "timeline_date": "2022-09-08",
+    "status": "사업 지정",
+    "sort_order": 1,
+    "source_url": "https://event.seoul.go.kr/snews/data/CN_MST/seoulsibo_20220907175540_11344.pdf",
+    "source_name": "서울시보",
+    "reference_date": "2026-04-14"
+  }
+]

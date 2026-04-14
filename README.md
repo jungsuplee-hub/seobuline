@@ -27,7 +27,8 @@ cp .env.example .env.local
 - `SESSION_SECRET`: 세션 관련 내부 키(임의 긴 문자열)
 
 선택값:
-- `NEXT_PUBLIC_SITE_URL` (기본 `http://localhost:5050`)
+- `APP_BASE_URL` (운영 권장: `https://seobuline.kro.kr`)
+- `NEXT_PUBLIC_SITE_URL` (기본 `http://localhost:5050`, 클라이언트 표시용)
 - 뉴스 수집 관련
   - `NEWS_RSS_URL`
   - `NEWS_MAX_ITEMS`
@@ -62,14 +63,30 @@ docker build -t seobuline .
 docker run --rm -p 5050:5050 -e SESSION_SECRET=change-me seobuline
 ```
 
-## 뉴스 자동 업데이트
+## 콘텐츠 정기 업데이트 (cron)
 ### 수동 실행
 ```bash
-npm run news:sync
+npm run update:site-content
+npm run update:timeline
+npm run update:politicians
+npm run update:news
+npm run update:all
 ```
 
 ### cron 등록 (서버)
-`deploy/cron/news-sync.cron` 참고
+```cron
+0 6 * * * cd /path/to/seobuline && npm run update:all >> /var/log/seobuline-cron.log 2>&1
+```
+
+또는 쉘 래퍼 사용:
+```bash
+chmod +x scripts/run-cron-updates.sh
+```
+```cron
+0 6 * * * cd /path/to/seobuline && ./scripts/run-cron-updates.sh >> /var/log/seobuline-cron.log 2>&1
+```
+
+상세 문서: `docs/content-update.md`, 예시 crontab: `deploy/example-crontab.txt`
 
 ## 참고
 - 로컬 DB 파일: `data/seobuline.db`
@@ -96,7 +113,8 @@ npm run news:sync
 ## 비밀번호 초기화
 - 로그인 화면의 `비밀번호 초기화` 링크를 통해 `/forgot-password` 접근
 - 이메일 입력 시 `password_reset_tokens`에 토큰 생성(만료 30분)
-- 개발환경에서는 생성된 재설정 URL을 화면과 서버 로그에 표시
+- 재설정 URL은 `APP_BASE_URL` 우선, 없으면 `x-forwarded-proto`/`x-forwarded-host`/`host` 헤더로 절대 URL 생성
+- 운영 환경 권장값: `APP_BASE_URL=https://seobuline.kro.kr`
 - `/reset-password?token=...` 에서 새 비밀번호 저장 후 토큰 무효화
 - 비밀번호 변경 시 기존 세션 만료 처리
 

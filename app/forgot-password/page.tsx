@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
   return (
     <Card className="mx-auto max-w-lg border-[#d0a453]/40 bg-[#111824]">
       <h1 className="text-2xl font-bold">비밀번호 초기화</h1>
-      <p className="mt-1 text-sm text-[#dccdaf]">개발 환경에서는 생성된 재설정 링크가 화면에 표시됩니다.</p>
+      <p className="mt-1 text-sm text-[#dccdaf]">요청이 성공하면 운영 도메인 기준의 비밀번호 재설정 링크가 표시됩니다.</p>
       <form className="mt-4 space-y-3" onSubmit={onSubmit}>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="가입한 이메일" required />
         {error && <p className="text-sm text-red-300">{error}</p>}

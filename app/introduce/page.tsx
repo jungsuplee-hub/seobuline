@@ -1,2 +1,0 @@
-import { Card } from "@/components/ui/card";import { faqItems } from "@/lib/mock-data";
-export default function IntroducePage(){return <div className="space-y-4"><h1 className="text-2xl font-bold">서부선 소개</h1><Card><h2 className="font-semibold">사업 개요</h2><p className="mt-2 text-sm">서부권 이동 편의 향상과 균형 발전을 위한 도시철도 사업입니다.</p></Card><Card><h2 className="font-semibold">FAQ</h2><ul className="mt-2 space-y-2 text-sm">{faqItems.map(f=><li key={f.q}><strong>{f.q}</strong><p>{f.a}</p></li>)}</ul></Card></div>;}

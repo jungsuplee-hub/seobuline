@@ -1,3 +1,0 @@
-import { Card } from "@/components/ui/card";
-const events=[{title:"주민 공청회",date:"2026-04-30",location:"서대문구청",description:"사업 진행현황 공유"},{title:"정책 간담회",date:"2026-05-16",location:"은평문화회관",description:"예산/추진 절차 안내"},{title:"자원봉사자 오리엔테이션",date:"2026-05-23",location:"온라인",description:"캠페인 운영 교육"}];
-export default function EventsPage(){return <div className="space-y-4"><h1 className="text-2xl font-bold">일정</h1>{events.map(e=><Card key={e.title}><h2 className="font-semibold">{e.title}</h2><p className="text-sm text-slate-500">{e.date} · {e.location}</p><p className="mt-2 text-sm">{e.description}</p></Card>)}</div>;}

@@ -1,2 +1,0 @@
-import { NextResponse } from "next/server";import { news } from "@/lib/mock-data";import { newsSchema } from "@/lib/validations";
-export async function GET(){return NextResponse.json(news);}export async function POST(req:Request){const p=newsSchema.safeParse(await req.json());if(!p.success) return NextResponse.json({error:p.error.flatten()},{status:400});return NextResponse.json({message:"created",data:p.data},{status:201});}

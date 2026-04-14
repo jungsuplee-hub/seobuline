@@ -1,3 +1,0 @@
-import { Card } from "@/components/ui/card";
-const resources=[{title:"서부선 타당성 분석 요약",category:"보고서",type:"pdf",size:1200000},{title:"주민설명회 발표자료",category:"발표",type:"pdf",size:860000},{title:"노선도 이미지",category:"이미지",type:"png",size:420000}];
-export default function ResourcesPage(){return <div className="space-y-4"><h1 className="text-2xl font-bold">자료실</h1>{resources.map(r=><Card key={r.title}><h2 className="font-semibold">{r.title}</h2><p className="text-sm text-slate-500">{r.category} · {r.type} · {(r.size/1000).toFixed(0)}KB</p><button className="mt-2 text-sm text-primary underline">다운로드</button></Card>)}</div>;}

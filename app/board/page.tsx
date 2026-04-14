@@ -1,2 +1,0 @@
-import { Card } from "@/components/ui/card";import { posts } from "@/lib/mock-data";
-export default function BoardPage(){return <div className="space-y-4"><h1 className="text-2xl font-bold">게시판</h1><p className="text-sm">비회원 열람 가능 · 회원 글쓰기 가능</p>{posts.map(p=><Card key={p.id}><h2 className="font-semibold">{p.title}</h2><p className="text-sm text-slate-500">{p.category} · {p.created_at} · 조회수 12</p><p className="mt-2 text-sm">댓글/신고/첨부파일 기능은 API와 DB 스키마 포함.</p></Card>)}</div>;}

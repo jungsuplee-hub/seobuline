@@ -1,1 +1,0 @@
-export default function UnauthorizedPage(){return <div className="rounded-lg border p-8 text-center"><h1 className="text-2xl font-bold">권한 없음</h1><p className="mt-2 text-sm">해당 페이지는 운영진만 접근할 수 있습니다.</p></div>;}

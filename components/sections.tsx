@@ -33,7 +33,7 @@ export function HeroSection() {
           확인된 사실만 정리해 주민 참여와 정책 감시를 돕습니다.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Button href="/join">참여하기</Button>
+          <Button href="/route-map">예상노선도 보기</Button>
           <Button href="/board" variant="outline">
             게시판 보기
           </Button>
@@ -49,10 +49,10 @@ export function HeroSection() {
 export async function HomeGrid({ userCount, homeViewCount }: { userCount: number; homeViewCount: number }) {
   const news = await getNews();
 
-  const metricCards: Array<{ text: string; href: "/" | "/news" | "/notices" | "/join" }> = [
+  const metricCards: Array<{ text: string; href: "/" | "/news" | "/notices" | "/route-map" | "/board" }> = [
     { text: `최신 뉴스 ${news.length}건`, href: "/news" },
     { text: `최근 공지 ${notices.length}건`, href: "/notices" },
-    { text: `가입 회원 수 ${userCount}명`, href: "/join" },
+    { text: `가입 회원 수 ${userCount}명`, href: "/board" },
     { text: `홈페이지 조회수 ${homeViewCount}회`, href: "/" },
   ];
 
@@ -176,9 +176,10 @@ export async function HomeLists() {
 export function CampaignBanner() {
   return (
     <Card className="border-[#d0a453]/40 bg-[linear-gradient(135deg,rgba(208,164,83,0.2),rgba(14,20,30,0.95))]">
-      <p className="text-xl font-semibold">서부선 정상화 시민 네트워크에 참여해 주세요.</p>
-      <p className="mt-2 text-sm text-[#e7d9c1]">정책 변동, 공청회, 공지사항을 빠르게 공유합니다.</p>
-      <div className="mt-4">
+      <p className="text-xl font-semibold">서부선 예상노선도와 소통 채널을 확인해 주세요.</p>
+      <p className="mt-2 text-sm text-[#e7d9c1]">최신 예상노선도는 전용 페이지에서 확인하고, 소식 공유는 오픈채팅방에서 이어가실 수 있습니다.</p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <Button href="/route-map" variant="outline">서부선 예상노선도 보기</Button>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer"><Button>오픈채팅방 바로가기 ↗</Button></a>
       </div>
     </Card>

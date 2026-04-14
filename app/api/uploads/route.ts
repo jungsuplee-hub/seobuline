@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { saveUploadedImage } from "@/lib/upload";
 
-const ADMIN_SCOPES = new Set(["news", "notices", "politicians", "resources", "site", "timeline"]);
+const ADMIN_SCOPES = new Set(["news", "notices", "politicians", "resources", "site", "timeline", "route-map"]);
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();

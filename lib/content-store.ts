@@ -34,6 +34,11 @@ export async function getSiteContent(): Promise<SiteContent> {
   } as SiteContent;
 }
 
+export function getRouteMapImageUrl() {
+  const row = db.prepare("SELECT route_map_image_url FROM site_content WHERE id = 1").get() as { route_map_image_url: string | null } | undefined;
+  return row?.route_map_image_url ?? null;
+}
+
 export async function getTimelineItems() {
   const rows = db.prepare("SELECT title, description, timeline_date, status, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
   if (!rows.length) {

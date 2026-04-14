@@ -32,7 +32,7 @@ export default function AdminImageInput({ scope, name, defaultUrl }: { scope: st
       {error && <p className="text-xs text-red-300">{error}</p>}
       {url && (
         <div className="space-y-2">
-          <img src={url} alt="미리보기" className="h-28 w-full rounded object-cover" />
+          <img src={url} alt="미리보기" className="max-h-[420px] w-full rounded border border-[#d0a453]/30 object-contain" />
           <button type="button" onClick={() => setUrl("")} className="rounded border px-2 py-1 text-xs">이미지 제거</button>
         </div>
       )}

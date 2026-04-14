@@ -7,9 +7,9 @@ const nav = [
   ["뉴스", "/news"],
   ["공지", "/notices"],
   ["게시판", "/board"],
+  ["예상노선도", "/route-map"],
   ["정치인정보", "/politicians"],
   ["자료실", "/resources"],
-  ["참여", "/join"],
 ] as const;
 
 const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
@@ -69,6 +69,9 @@ export function Footer() {
     <footer className="mt-16 border-t border-[#d0a453]/20 bg-[#0d121b] text-sm text-[#d6c5aa]">
       <div className="container-width space-y-2 py-8">
         <p>© 2026 서부선 정상화 추진위원회 · 공개 출처 기반 정보 아카이브</p>
+        <Link href="/route-map" className="mr-4 underline">
+          예상노선도 보기
+        </Link>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer" className="underline">
           오픈채팅방 바로가기 ↗
         </a>

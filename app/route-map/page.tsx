@@ -1,0 +1,37 @@
+import Image from "next/image";
+import { Card } from "@/components/ui/card";
+import { getRouteMapImageUrl } from "@/lib/content-store";
+
+export const dynamic = "force-dynamic";
+
+export default function RouteMapPage() {
+  const imageUrl = getRouteMapImageUrl();
+
+  return (
+    <div className="space-y-4">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-bold">서부선 예상노선도</h1>
+        <p className="text-sm text-[#decfb8]">관리자가 등록한 최신 예상노선도입니다. 노선도 이미지는 수시로 업데이트될 수 있습니다.</p>
+      </header>
+
+      {!imageUrl ? (
+        <Card>
+          <p className="text-sm">등록된 예상노선도 이미지가 없습니다.</p>
+        </Card>
+      ) : (
+        <section className="overflow-hidden rounded-xl border border-[#d0a453]/25 bg-[#0f1622] p-2 md:p-4">
+          <a href={imageUrl} target="_blank" rel="noreferrer" className="block">
+            <Image
+              src={imageUrl}
+              alt="서부선 예상노선도"
+              width={2400}
+              height={1600}
+              className="h-auto w-full object-contain"
+              priority
+            />
+          </a>
+        </section>
+      )}
+    </div>
+  );
+}

@@ -138,6 +138,7 @@ export function initDb() {
       id INTEGER PRIMARY KEY CHECK (id = 1),
       about_content TEXT,
       image_url TEXT,
+      route_map_image_url TEXT,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -172,6 +173,7 @@ export function initDb() {
   addColumnIfMissing("timeline_items", "image_url", "image_url TEXT");
   addColumnIfMissing("politicians", "image_url", "image_url TEXT");
   addColumnIfMissing("resources", "thumbnail_url", "thumbnail_url TEXT");
+  addColumnIfMissing("site_content", "route_map_image_url", "route_map_image_url TEXT");
 
   db.prepare(
     `INSERT INTO site_stats (key, value, updated_at)

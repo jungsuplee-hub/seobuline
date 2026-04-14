@@ -44,16 +44,16 @@ export function HeroSection() {
   );
 }
 
-export async function HomeGrid() {
+export async function HomeGrid({ userCount, homeViewCount }: { userCount: number; homeViewCount: number }) {
   const news = await getNews();
 
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
       {[
         `최신 뉴스 ${news.length}건`,
-        `진행 타임라인 ${timelineItems.length}건`,
         `최근 공지 ${notices.length}건`,
-        `정치인 아카이브 ${politicianItems.length}명`,
+        `가입 회원 수 ${userCount}명`,
+        `홈페이지 조회수 ${homeViewCount}회`,
       ].map((text) => (
         <Card key={text}>
           <p className="text-xs text-[#cab898]">핵심 지표</p>

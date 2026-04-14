@@ -5,6 +5,7 @@ import type React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { REGIONS } from "@/lib/regions";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,11 @@ export default function SignupPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!region) {
+      setError("지역을 선택하세요.");
+      return;
+    }
 
     const res = await fetch("/api/auth/signup", {
       method: "POST",
@@ -41,7 +47,16 @@ export default function SignupPage() {
       <form className="mt-4 space-y-3" onSubmit={onSubmit}>
         <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호(8자 이상)" required minLength={8} />
-        <input value={region} onChange={(e) => setRegion(e.target.value)} placeholder="지역정보(예: 은평구)" required />
+        <select value={region} onChange={(e) => setRegion(e.target.value)} required>
+          <option value="" disabled>
+            지역을 선택하세요
+          </option>
+          {REGIONS.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
         <input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="닉네임(선택)" />
         {error && <p className="text-sm text-red-300">{error}</p>}
         <Button type="submit" className="w-full">가입하기</Button>

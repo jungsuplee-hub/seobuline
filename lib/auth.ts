@@ -1,5 +1,5 @@
 import { randomBytes, createHmac } from "node:crypto";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
@@ -22,6 +22,13 @@ function hashToken(token: string) {
   return createHmac("sha256", secret).update(token).digest("hex");
 }
 
+async function isSecureRequest() {
+  if (process.env.NODE_ENV !== "production") return false;
+  const headerStore = await headers();
+  const forwardedProto = headerStore.get("x-forwarded-proto");
+  return forwardedProto ? forwardedProto.includes("https") : true;
+}
+
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 12);
 }
@@ -37,10 +44,11 @@ export async function createSession(userId: number) {
 
   db.prepare("INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)").run(userId, token, expiresAt);
 
+  const secure = await isSecureRequest();
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, rawToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax",
     path: "/",
     expires: new Date(expiresAt),
@@ -48,12 +56,20 @@ export async function createSession(userId: number) {
 }
 
 export async function clearSession() {
+  const secure = await isSecureRequest();
   const cookieStore = await cookies();
   const rawToken = cookieStore.get(SESSION_COOKIE)?.value;
   if (rawToken) {
     db.prepare("DELETE FROM sessions WHERE token = ?").run(hashToken(rawToken));
   }
-  cookieStore.delete(SESSION_COOKIE);
+  cookieStore.set(SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(0),
+    maxAge: 0,
+  });
 }
 
 export async function getCurrentUser(): Promise<SessionUser | null> {

@@ -1,30 +1,23 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-async function bodyFrom(req: Request) {
-  const type = req.headers.get("content-type") || "";
-  if (type.includes("form")) return Object.fromEntries((await req.formData()).entries());
-  return req.json();
-}
+import { getCurrentUser } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 export async function POST(req: Request) {
-  const body = await bodyFrom(req);
-  const admin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+
+  const body = Object.fromEntries((await req.formData()).entries());
+  const region = String(body.region || "").trim();
+  const nicknameRaw = String(body.nickname || "").trim();
+  const nickname = nicknameRaw.length ? nicknameRaw : null;
+
+  if (!region) return NextResponse.json({ error: "지역을 입력해 주세요." }, { status: 400 });
+
+  db.prepare("UPDATE users SET region = ?, nickname = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(
+    region,
+    nickname,
+    user.id,
   );
 
-  const { error } = await admin.from("profiles").upsert({
-    user_id: body.userId,
-    email: body.email,
-    region: body.region,
-    nickname: body.nickname || null,
-    role: "user",
-  });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  if ((req.headers.get("content-type") || "").includes("form")) {
-    return NextResponse.redirect(new URL("/mypage", req.url), { status: 303 });
-  }
-  return NextResponse.json({ ok: true });
+  return NextResponse.redirect(new URL("/mypage", req.url), { status: 303 });
 }

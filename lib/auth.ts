@@ -1,53 +1,96 @@
+import { randomBytes, createHmac } from "node:crypto";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getSupabaseServerClient } from "@/lib/supabase";
+import bcrypt from "bcryptjs";
+import { db } from "@/lib/db";
 
-export type Role = "user" | "moderator" | "admin";
+export type Role = "user";
 
 export type SessionUser = {
-  id: string;
+  id: number;
   email: string;
   role: Role;
-  region: string | null;
+  region: string;
   nickname: string | null;
-  profileId: string | null;
 };
 
+const SESSION_COOKIE = "seobuline_session";
+const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 14;
+
+function hashToken(token: string) {
+  const secret = process.env.SESSION_SECRET || "dev-only-session-secret";
+  return createHmac("sha256", secret).update(token).digest("hex");
+}
+
+export async function hashPassword(password: string) {
+  return bcrypt.hash(password, 12);
+}
+
+export async function verifyPassword(password: string, passwordHash: string) {
+  return bcrypt.compare(password, passwordHash);
+}
+
+export async function createSession(userId: number) {
+  const rawToken = randomBytes(32).toString("hex");
+  const token = hashToken(rawToken);
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS).toISOString();
+
+  db.prepare("INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)").run(userId, token, expiresAt);
+
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, rawToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(expiresAt),
+  });
+}
+
+export async function clearSession() {
+  const cookieStore = await cookies();
+  const rawToken = cookieStore.get(SESSION_COOKIE)?.value;
+  if (rawToken) {
+    db.prepare("DELETE FROM sessions WHERE token = ?").run(hashToken(rawToken));
+  }
+  cookieStore.delete(SESSION_COOKIE);
+}
+
 export async function getCurrentUser(): Promise<SessionUser | null> {
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const cookieStore = await cookies();
+  const rawToken = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!rawToken) return null;
 
-  if (!user || !user.email) return null;
+  const now = new Date().toISOString();
+  const session = db
+    .prepare(
+      `SELECT s.user_id, u.email, u.region, u.nickname
+       FROM sessions s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.token = ? AND s.expires_at > ?`,
+    )
+    .get(hashToken(rawToken), now) as { user_id: number; email: string; region: string; nickname: string | null } | undefined;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, region, nickname")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  if (!session) {
+    cookieStore.delete(SESSION_COOKIE);
+    return null;
+  }
 
   return {
-    id: user.id,
-    email: user.email,
-    role: (profile?.role as Role | undefined) ?? "user",
-    region: profile?.region ?? null,
-    nickname: profile?.nickname ?? null,
-    profileId: profile?.id ?? null,
+    id: session.user_id,
+    email: session.email,
+    role: "user",
+    region: session.region,
+    nickname: session.nickname,
   };
 }
 
-export async function requireAuth() {
+export async function requireAuth(nextPath = "/mypage") {
   const user = await getCurrentUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent("/mypage")}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   return user;
 }
 
-export async function requireRole(roles: Role[]) {
-  const user = await requireAuth();
-  if (!roles.includes(user.role)) redirect("/unauthorized");
-  return user;
-}
-
-export async function requireModeratorOrAdmin() {
-  return requireRole(["moderator", "admin"]);
+export function validateEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

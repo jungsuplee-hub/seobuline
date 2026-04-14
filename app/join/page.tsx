@@ -9,7 +9,7 @@ export default function JoinPage() {
       <h1 className="text-2xl font-bold">참여하기</h1>
       <Card>
         <h2 className="font-semibold">카카오톡 채팅방 참여</h2>
-        <p className="mt-2 text-sm">진행현황 공유, 공청회/공지 알림, 주민 네트워크 소통을 오픈채팅방에서 운영합니다.</p>
+        <p className="mt-2 text-sm">진행현황 공유, 공청회/공지 알림, 주민 네트워크 소통을 오픈채팅방에서 운영합니다. 게시판 글쓰기는 로그인 후 가능합니다.</p>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer" className="mt-3 inline-block">
           <Button>카카오톡 채팅방 참여하기 ↗</Button>
         </a>

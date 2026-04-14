@@ -169,6 +169,37 @@ tail -f /var/log/seobuline-cron.log
 - `/reset-password?token=...` 에서 새 비밀번호 저장 후 토큰 무효화
 - 비밀번호 변경 시 기존 세션 만료 처리
 
+## 정치인 정보(관리자) 수정 방법
+1. 관리자(또는 매니저) 계정으로 로그인합니다.
+2. `정치인 정보공유` 페이지(`/politicians`)로 이동합니다.
+3. 카드의 `수정` 버튼을 눌러 편집 페이지(`/politicians/[id]/edit`)로 들어갑니다.
+4. 항목을 수정한 뒤 `수정 저장`을 누르면 `/api/politicians/[id]` PATCH 요청으로 반영됩니다.
+
+### 수정이 안 될 때 점검
+- `수정` 버튼 자체가 안 보이면 계정 role이 `admin` 또는 `manager`인지 확인하세요.
+- 저장 후 JSON 에러가 뜨면 권한(403) 문제일 가능성이 큽니다. 현재 수정/삭제 API는 `admin`/`manager`만 허용합니다.
+- 프록시 환경이라면 `X-Forwarded-Proto`, `X-Forwarded-Host` 헤더가 전달되는지 확인하세요(리다이렉트/세션 문제 방지).
+
+### 우회 수정 방법(SQL 직접 반영)
+앱에서 반영이 계속 실패하면 SQLite에 직접 수정할 수 있습니다.
+
+```sql
+UPDATE politicians
+SET
+  name = '홍길동',
+  party = '예시정당',
+  district = '은평구',
+  office_type = '국회의원',
+  region_tags = '은평구,서대문구',
+  summary = '수정 요약',
+  stance_or_relevance = '입장/연관성',
+  election_2026_status = '출마 예정',
+  source_name = '관리자 수동 수정',
+  source_url = 'https://example.com',
+  is_visible = 1
+WHERE id = 1;
+```
+
 ## Apache Reverse Proxy 권장
 - 예시 파일: `docs/apache-example.conf`
 - 필수 권장 헤더

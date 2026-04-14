@@ -1,0 +1,20 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="700" fill="#0E1624"/>
+  <rect x="54" y="72" width="792" height="556" rx="24" fill="#152338" stroke="#D0A453" stroke-opacity="0.4"/>
+  <text x="92" y="132" fill="#F7D899" font-size="34" font-family="sans-serif">서부권 연결성 강화 포인트</text>
+  <text x="92" y="188" fill="#EADCC3" font-size="24" font-family="sans-serif">• 은평·서대문·마포: 도심 접근 경로 다변화</text>
+  <text x="92" y="238" fill="#EADCC3" font-size="24" font-family="sans-serif">• 영등포·동작: 여의도 생활권 환승 효율 개선</text>
+  <text x="92" y="288" fill="#EADCC3" font-size="24" font-family="sans-serif">• 관악: 주요 업무지구 연결의 시간 안정성 강화</text>
+  <text x="92" y="338" fill="#EADCC3" font-size="24" font-family="sans-serif">• 안양 연계권: 광역 환승 선택지 확대 기대</text>
+
+  <circle cx="690" cy="480" r="94" fill="#1B304C"/>
+  <circle cx="690" cy="480" r="72" fill="#223A58"/>
+  <text x="648" y="488" fill="#F7D899" font-size="20" font-family="sans-serif">환승</text>
+  <text x="648" y="514" fill="#F7D899" font-size="20" font-family="sans-serif">개선</text>
+
+  <path d="M220 430H610" stroke="#D0A453" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="220" cy="430" r="12" fill="#F7D899"/>
+  <circle cx="350" cy="430" r="12" fill="#F7D899"/>
+  <circle cx="480" cy="430" r="12" fill="#F7D899"/>
+  <circle cx="610" cy="430" r="12" fill="#F7D899"/>
+</svg>

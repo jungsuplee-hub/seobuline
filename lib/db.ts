@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
+import { ADMIN_EMAILS, normalizeEmail } from "@/lib/auth-config";
 
 const dataDir = path.join(process.cwd(), "data");
 const dbPath = path.join(dataDir, "seobuline.db");
@@ -18,6 +19,18 @@ function addColumnIfMissing(table: string, column: string, ddl: string) {
   if (!columns.some((item) => item.name === column)) {
     db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
   }
+}
+
+function promoteConfiguredAdminUsers() {
+  const normalizedAdminEmails = ADMIN_EMAILS.map((email) => normalizeEmail(email));
+  if (!normalizedAdminEmails.length) return;
+
+  const placeholders = normalizedAdminEmails.map(() => "?").join(", ");
+  db.prepare(
+    `UPDATE users
+     SET role = 'admin', updated_at = CURRENT_TIMESTAMP
+     WHERE lower(trim(email)) IN (${placeholders}) AND role <> 'admin'`,
+  ).run(...normalizedAdminEmails);
 }
 
 export function initDb() {
@@ -182,6 +195,7 @@ export function initDb() {
   ).run();
 
   db.prepare("INSERT INTO site_content (id, about_content) VALUES (1, '') ON CONFLICT(id) DO NOTHING").run();
+  promoteConfiguredAdminUsers();
 
   initialized = true;
 }

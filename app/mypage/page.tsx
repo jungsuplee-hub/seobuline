@@ -24,6 +24,7 @@ export default async function MyPage({
       <Card>
         <h2 className="font-semibold">내 프로필</h2>
         <p className="mt-1 text-sm">이메일: {user.email}</p>
+        <p className="mt-1 text-sm">권한(Role): {user.role}</p>
         <form action="/api/profile" method="post" className="mt-3 grid gap-2 md:grid-cols-2">
           <select name="region" defaultValue={user.region ?? ""} required>
             <option value="" disabled>

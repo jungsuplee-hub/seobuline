@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { requireAdmin } from "@/lib/auth";
 
 export default async function AdminPage() {
-  await requireAdmin("/admin");
+  const user = await requireAdmin("/admin");
 
   const links = [
     ["소개 관리", "/admin/about"],
@@ -19,6 +19,9 @@ export default async function AdminPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">운영 관리자</h1>
+      <p className="text-sm text-[#d6c5aa]">
+        로그인 계정: {user.email} · 권한: {user.role}
+      </p>
       {links.map(([label, href]) => (
         <Card key={href}>
           <Link href={href} className="font-semibold underline">{label}</Link>

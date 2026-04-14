@@ -98,3 +98,14 @@ systemctl status seobuline-news-sync.timer
 - 통합 검색
 - 파일 미리보기 강화
 - 감사로그 관리자 UI
+
+
+## 실제 데이터 반영 범위
+- 서부선 소개(사업개요/배경/노선/기대효과/주민 관점)와 FAQ를 공개 출처 기반 텍스트로 반영
+- 진행현황 타임라인, 뉴스/기사, 정치인 정보공유, 자료실을 실제 URL/발행일 기준 데이터로 교체
+- 홈 화면에 최신 뉴스/최근 공지/진행현황/FAQ 일부가 실제 데이터로 노출되도록 연결
+
+## 출처 관리 방식
+- 모든 핵심 데이터 항목에 `source_url`, `source_name`, `reference_date`(기준일) 또는 `published_date`를 함께 저장
+- DB 스키마는 `supabase/migrations/002_source_fields.sql`에서 출처 필드 확장을 수행
+- 수집/검수 기준일은 기본적으로 `2026-04-14`로 통일하여 기록

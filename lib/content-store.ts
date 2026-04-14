@@ -10,6 +10,15 @@ export interface SiteContent {
   faqItems: typeof faqItems;
 }
 
+type IntroduceSectionOverrides = Partial<{
+  business_summary: string;
+  route_overview: string;
+  resident_perspective_summary: string;
+  추진_background: string[];
+  major_stations_or_sections: string[];
+  expected_effects: string[];
+}>;
+
 export interface TimelineItem {
   id?: number;
   title: string;
@@ -33,10 +42,22 @@ async function readJsonFile<T>(fileName: string, fallback: T): Promise<T> {
 
 export async function getSiteContent(): Promise<SiteContent> {
   const base = await readJsonFile<SiteContent>("site-content.json", { projectOverview, faqItems });
-  const row = db.prepare("SELECT about_content, image_url FROM site_content WHERE id = 1").get() as { about_content: string | null; image_url: string | null } | undefined;
+  const row = db.prepare("SELECT about_content, image_url, introduce_sections_json FROM site_content WHERE id = 1").get() as
+    | { about_content: string | null; image_url: string | null; introduce_sections_json: string | null }
+    | undefined;
   if (!row) return base;
 
-  const mergedAboutContent = row.about_content?.trim() ? row.about_content : base.projectOverview.business_summary;
+  let sectionOverrides: IntroduceSectionOverrides = {};
+  if (row.introduce_sections_json?.trim()) {
+    try {
+      const parsed = JSON.parse(row.introduce_sections_json) as IntroduceSectionOverrides;
+      sectionOverrides = parsed;
+    } catch {
+      sectionOverrides = {};
+    }
+  }
+
+  const mergedAboutContent = sectionOverrides.business_summary?.trim() || (row.about_content?.trim() ? row.about_content : base.projectOverview.business_summary);
   const mergedHeroImageUrl = row.image_url?.trim() ? row.image_url : ((base.projectOverview as { hero_image_url?: string | null }).hero_image_url ?? null);
 
   return {
@@ -44,6 +65,17 @@ export async function getSiteContent(): Promise<SiteContent> {
     projectOverview: {
       ...base.projectOverview,
       business_summary: mergedAboutContent,
+      route_overview: sectionOverrides.route_overview?.trim() || base.projectOverview.route_overview,
+      resident_perspective_summary: sectionOverrides.resident_perspective_summary?.trim() || base.projectOverview.resident_perspective_summary,
+      추진_background: Array.isArray(sectionOverrides["추진_background"]) && sectionOverrides["추진_background"].length
+        ? sectionOverrides["추진_background"]
+        : base.projectOverview["추진_background"],
+      major_stations_or_sections: Array.isArray(sectionOverrides.major_stations_or_sections) && sectionOverrides.major_stations_or_sections.length
+        ? sectionOverrides.major_stations_or_sections
+        : base.projectOverview.major_stations_or_sections,
+      expected_effects: Array.isArray(sectionOverrides.expected_effects) && sectionOverrides.expected_effects.length
+        ? sectionOverrides.expected_effects
+        : base.projectOverview.expected_effects,
       hero_image_url: mergedHeroImageUrl,
     },
   } as SiteContent;

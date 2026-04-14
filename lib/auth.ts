@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 
-export type Role = "user";
+export type Role = "user" | "moderator" | "admin";
 
 export type SessionUser = {
   id: number;
@@ -87,12 +87,12 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   const now = new Date().toISOString();
   const session = db
     .prepare(
-      `SELECT s.user_id, u.email, u.region, u.nickname
+      `SELECT s.user_id, u.email, u.region, u.nickname, u.role
        FROM sessions s
        JOIN users u ON u.id = s.user_id
        WHERE s.token = ? AND s.expires_at > ?`,
     )
-    .get(hashToken(rawToken), now) as { user_id: number; email: string; region: string; nickname: string | null } | undefined;
+    .get(hashToken(rawToken), now) as { user_id: number; email: string; region: string; nickname: string | null; role: Role } | undefined;
 
   if (!session) {
     cookieStore.delete(SESSION_COOKIE);
@@ -102,7 +102,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   return {
     id: session.user_id,
     email: session.email,
-    role: "user",
+    role: session.role || "user",
     region: session.region,
     nickname: session.nickname,
   };
@@ -111,6 +111,14 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
 export async function requireAuth(nextPath = "/mypage") {
   const user = await getCurrentUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
+  return user;
+}
+
+export async function requireAdmin(nextPath = "/") {
+  const user = await requireAuth(nextPath);
+  if (user.role !== "admin" && user.role !== "moderator") {
+    redirect("/unauthorized");
+  }
   return user;
 }
 

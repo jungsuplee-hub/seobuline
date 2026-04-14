@@ -1,0 +1,22 @@
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import { redirectWithForwardedHeaders } from "@/lib/request";
+
+export async function GET() {
+  const items = db.prepare("SELECT * FROM resources ORDER BY created_at DESC").all();
+  return NextResponse.json({ entity: "resources", items });
+}
+
+export async function POST(req: Request) {
+  const user = await getCurrentUser();
+  if (!user || (user.role !== "admin" && user.role !== "moderator")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const form = await req.formData();
+  db.prepare("INSERT INTO resources (title, url, category, thumbnail_url) VALUES (?, ?, ?, ?)").run(
+    String(form.get("title") || "").trim(),
+    String(form.get("url") || "").trim(),
+    String(form.get("category") || "").trim(),
+    String(form.get("thumbnail_url") || "").trim() || null,
+  );
+  return redirectWithForwardedHeaders(req, "/admin/resources");
+}

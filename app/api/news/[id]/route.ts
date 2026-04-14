@@ -1,47 +1,40 @@
 import { NextResponse } from "next/server";
-import { getNews, saveNews } from "@/lib/news-store";
-import { newsSchema } from "@/lib/validations";
+import { db } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import { redirectWithForwardedHeaders } from "@/lib/request";
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  const parsed = newsSchema.partial().safeParse(await req.json());
-
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  }
-
-  const items = await getNews();
-  const index = items.findIndex((item) => item.id === id);
-
-  if (index < 0) {
-    return NextResponse.json({ error: "not found" }, { status: 404 });
-  }
-
-  const updated = { ...items[index], ...parsed.data };
-  const next = [...items];
-  next[index] = updated;
-
-  await saveNews(next);
-
-  return NextResponse.json({ id, data: updated });
+async function checkAdmin() {
+  const user = await getCurrentUser();
+  return Boolean(user && (user.role === "admin" || user.role === "moderator"));
 }
 
-export async function DELETE(
-  _: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const { id } = await params;
-  const items = await getNews();
-  const next = items.filter((item) => item.id !== id);
+export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
+  if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
+  const {id}=await params;
+  const form = await req.formData();
+  db.prepare("UPDATE news_articles SET title=?, source_name=?, summary=?, source_url=?, category=?, image_url=?, published_date=? WHERE id = ?").run(
+    String(form.get("title") || "").trim(),
+    String(form.get("source_name") || "").trim(),
+    String(form.get("summary") || "").trim(),
+    String(form.get("source_url") || "").trim(),
+    String(form.get("category") || "").trim(),
+    String(form.get("image_url") || "").trim() || null,
+    String(form.get("published_date") || "").trim(),
+    id,
+  );
+  return redirectWithForwardedHeaders(req, "/admin/news");
+}
 
-  if (next.length === items.length) {
-    return NextResponse.json({ error: "not found" }, { status: 404 });
-  }
+export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>}){
+  if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
+  const {id}=await params;
+  db.prepare("DELETE FROM news_articles WHERE id = ?").run(id);
+  return redirectWithForwardedHeaders(req, "/admin/news");
+}
 
-  await saveNews(next);
-
-  return NextResponse.json({ deletedId: id });
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const form = Object.fromEntries((await req.formData()).entries());
+  const method = String(form._method || "PATCH").toUpperCase();
+  if (method === "DELETE") return DELETE(req, { params });
+  return PATCH(req, { params });
 }

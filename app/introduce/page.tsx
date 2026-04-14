@@ -26,7 +26,7 @@ export default async function IntroducePage() {
     <div className="space-y-6">
       <section className="relative overflow-hidden rounded-2xl border border-[#d0a453]/25">
         <Image
-          src="/assets/route-overview.svg"
+          src={(projectOverview as { hero_image_url?: string | null }).hero_image_url || "/assets/route-overview.svg"}
           alt="서부선 노선 개요를 설명하는 시각 자료"
           width={1400}
           height={760}

@@ -14,16 +14,16 @@ export default function PoliticiansClient({ items }: { items: PoliticianItem[] }
   const [party, setParty] = useState("all");
   const [query, setQuery] = useState(searchParams.get("query") || "");
 
-  const visibleItems = useMemo(() => items.filter((item) => item.is_visible), [items]);
+  const visibleItems = useMemo(() => items.filter((item) => item.is_visible !== false), [items]);
 
-  const regions = useMemo(() => ["all", ...new Set(visibleItems.flatMap((item) => item.region_tags))], [visibleItems]);
+  const regions = useMemo(() => ["all", ...new Set(visibleItems.flatMap((item) => (item.region_tags || [])))], [visibleItems]);
   const offices = useMemo(() => ["all", ...new Set(visibleItems.map((item) => item.office_type))], [visibleItems]);
   const parties = useMemo(() => ["all", ...new Set(visibleItems.map((item) => item.party))], [visibleItems]);
 
   const filtered = useMemo(
     () =>
       visibleItems.filter((item) => {
-        const byRegion = region === "all" || item.region_tags.includes(region);
+        const byRegion = region === "all" || (item.region_tags || []).includes(region);
         const byOffice = office === "all" || item.office_type === office;
         const byParty = party === "all" || item.party === party;
         const byQuery = !query || [item.name, item.summary, item.stance_or_relevance, item.district, item.party].join(" ").toLowerCase().includes(query.toLowerCase());
@@ -48,6 +48,7 @@ export default function PoliticiansClient({ items }: { items: PoliticianItem[] }
           <Card key={`${item.name}-${item.office_type}-${item.district}`} className="transition hover:border-[#d0a453]/50">
             <h2 className="font-semibold">{item.name} · {item.office_type}</h2>
             <p className="text-sm">{item.party} / {item.district}</p>
+            {(item as { image_url?: string | null }).image_url && <img src={(item as { image_url?: string | null }).image_url || ""} alt="정치인 이미지" className="mt-2 h-40 w-full rounded object-cover" />}
             <p className="mt-2 text-sm">{item.summary}</p>
             <p className="mt-1 text-sm text-[#dfcfb5]">서부선 관련성: {item.stance_or_relevance}</p>
             <p className="mt-1 text-xs text-[#cab898]">2026년 6월 지방선거 공개 확인 상태: {item.election_2026_status || "공개 확인 자료 없음"}</p>

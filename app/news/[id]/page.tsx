@@ -39,6 +39,7 @@ export default async function NewsDetailPage({
       <p className="text-sm">
         {article.source_name} · {article.published_date}
       </p>
+      {article.image_url && <img src={article.image_url} alt="뉴스 이미지" className="w-full rounded-lg object-cover" />}
       <p>{article.summary}</p>
       <a href={article.source_url} target="_blank" className="text-primary underline">
         원문 보기

@@ -1,10 +1,28 @@
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { requireAdmin } from "@/lib/auth";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  await requireAdmin("/admin");
+
+  const links = [
+    ["소개 관리", "/admin/about"],
+    ["진행현황 관리", "/admin/timeline"],
+    ["뉴스 관리", "/admin/news"],
+    ["공지 관리", "/admin/notices"],
+    ["게시판 관리", "/admin/posts"],
+    ["정치인정보 관리", "/admin/politicians"],
+    ["자료실 관리", "/admin/resources"],
+  ] as const;
+
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">운영 페이지(준비 중)</h1>
-      <Card>현재 버전은 로컬 인증/게시판 중심으로 재구성되어 운영 전용 기능은 비활성화되어 있습니다.</Card>
+      <h1 className="text-2xl font-bold">운영 관리자</h1>
+      {links.map(([label, href]) => (
+        <Card key={href}>
+          <Link href={href} className="font-semibold underline">{label}</Link>
+        </Card>
+      ))}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { redirectWithForwardedHeaders } from "@/lib/request";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { parseImageUrls } from "@/lib/upload";
 
 function ownsPost(postId: string, userId: number) {
   const post = db.prepare("SELECT author_id FROM posts WHERE id = ? AND is_deleted = 0").get(postId) as
@@ -17,16 +18,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!ownsPost(id, user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const payload = Object.fromEntries((await req.formData()).entries());
-  db.prepare("UPDATE posts SET title = ?, content = ?, region = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(
+  const formData = await req.formData();
+  const payload = Object.fromEntries(formData.entries());
+  const imageUrls = parseImageUrls(formData.get("image_urls"));
+
+  db.prepare("UPDATE posts SET title = ?, content = ?, region = ?, category = ?, image_urls = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(
     String(payload.title || "").trim(),
     String(payload.content || "").trim(),
     String(payload.region || "").trim() || null,
     String(payload.category || "자유게시판").trim(),
+    JSON.stringify(imageUrls),
     id,
   );
 
-  return redirectWithForwardedHeaders(req, "/board");
+  return redirectWithForwardedHeaders(req, `/board/${id}`);
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {

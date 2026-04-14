@@ -10,7 +10,7 @@ export default async function BoardPage() {
   const user = await getCurrentUser();
   const items = db
     .prepare(
-      `SELECT p.id, p.title, p.content, p.region, p.category, p.created_at, p.view_count, u.nickname, u.email
+      `SELECT p.id, p.title, p.content, p.image_urls, p.region, p.category, p.created_at, p.view_count, u.nickname, u.email
        FROM posts p
        JOIN users u ON u.id = p.author_id
        WHERE p.is_deleted = 0
@@ -21,6 +21,7 @@ export default async function BoardPage() {
     id: number;
     title: string;
     content: string;
+    image_urls: string | null;
     region: string | null;
     category: string | null;
     created_at: string;
@@ -47,6 +48,7 @@ export default async function BoardPage() {
             </Link>
             <p className="text-xs text-[#a89b84]">{new Date(post.created_at).toLocaleDateString("ko-KR")}</p>
           </div>
+          {(() => { const images = post.image_urls ? (JSON.parse(post.image_urls) as string[]) : []; return images[0] ? <img src={images[0]} alt="썸네일" className="mt-2 h-28 w-full rounded object-cover" /> : null; })()}
           <p className="mt-2 line-clamp-2 text-sm text-[#ddd0b8]">{post.content}</p>
           <p className="mt-2 text-xs text-[#a89b84]">
             작성자: {post.nickname || post.email.split("@")[0]} · 지역: {post.region || "미입력"} · 조회수: {post.view_count}

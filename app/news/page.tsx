@@ -20,6 +20,7 @@ export default async function NewsPage() {
       {deduped.map((n) => (
         <Link key={n.id} href={`/news/${n.id}`} className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d0a453]/70">
           <Card className="transition hover:border-[#d0a453]/55 hover:bg-[#182233]">
+            {n.image_url && <img src={n.image_url} alt="뉴스 이미지" className="mb-2 h-40 w-full rounded object-cover" />}
             <p className="font-semibold group-hover:text-[#f7d899] group-focus-visible:text-[#f7d899]">{n.title}</p>
             <p className="text-sm text-slate-400">
               {n.source_name} · {n.published_date} · {n.category}

@@ -18,6 +18,13 @@ MODE="${SEOBULINE_UPDATE_MODE:-auto}"
 UPDATE_COMMAND="npm run update:all"
 LOCKED="${SEOBULINE_DISABLE_LOCK:-0}"
 
+declare -a COMPOSE_FILES=(
+  "compose.yaml"
+  "compose.yml"
+  "docker-compose.yml"
+  "docker-compose.yaml"
+)
+
 usage() {
   cat <<USAGE
 Usage: $(basename "$0") [--mode auto|compose|docker-exec|docker-run] [--no-lock]
@@ -30,6 +37,48 @@ Usage: $(basename "$0") [--mode auto|compose|docker-exec|docker-run] [--no-lock]
   SEOBULINE_UPDATE_LOCK_FILE     flock 잠금 파일 경로 (기본: /tmp/seobuline-update.lock)
   SEOBULINE_DISABLE_LOCK         1이면 잠금 비활성화
 USAGE
+}
+
+log_command() {
+  local rendered=""
+  local arg
+  for arg in "$@"; do
+    rendered+="$(printf '%q ' "${arg}")"
+  done
+  echo "[INFO] 실행 명령: ${rendered% }"
+}
+
+detect_compose_command() {
+  if docker compose version >/dev/null 2>&1; then
+    echo "docker compose"
+    return 0
+  fi
+
+  if command -v docker-compose >/dev/null 2>&1; then
+    echo "docker-compose"
+    return 0
+  fi
+
+  return 1
+}
+
+detect_compose_file() {
+  local candidate=""
+  for candidate in "${COMPOSE_FILES[@]}"; do
+    if [[ -f "${PROJECT_ROOT}/${candidate}" ]]; then
+      echo "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+has_running_container() {
+  docker ps --format '{{.Names}}' | grep -Fxq "${CONTAINER_NAME}"
+}
+
+show_running_containers() {
+  docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -61,60 +110,100 @@ fi
 
 run_update() {
   local compose_cmd=""
-  if docker compose version >/dev/null 2>&1; then
-    compose_cmd="docker compose"
-  elif command -v docker-compose >/dev/null 2>&1; then
-    compose_cmd="docker-compose"
+  local compose_file=""
+
+  compose_cmd="$(detect_compose_command || true)"
+  compose_file="$(detect_compose_file || true)"
+
+  local selected_mode="${MODE}"
+  if [[ "${MODE}" == "auto" ]]; then
+    if [[ -n "${compose_cmd}" && -n "${compose_file}" ]]; then
+      selected_mode="compose"
+    elif has_running_container; then
+      selected_mode="docker-exec"
+    else
+      selected_mode="docker-run"
+    fi
   fi
 
-  if [[ "${MODE}" == "compose" || "${MODE}" == "auto" ]]; then
-    if [[ -n "${compose_cmd}" && ( -f "${PROJECT_ROOT}/docker-compose.yml" || -f "${PROJECT_ROOT}/compose.yml" || -f "${PROJECT_ROOT}/compose.yaml" ) ]]; then
-      if (cd "${PROJECT_ROOT}" && ${compose_cmd} ps --status running --services 2>/dev/null | grep -Fxq "${SERVICE_NAME}"); then
-        echo "[INFO] compose exec 모드로 업데이트 실행: service=${SERVICE_NAME}"
-        cd "${PROJECT_ROOT}"
-        ${compose_cmd} exec -T "${SERVICE_NAME}" bash -lc "${UPDATE_COMMAND}"
+  case "${selected_mode}" in
+    compose)
+      if [[ -z "${compose_cmd}" ]]; then
+        echo "[ERROR] compose 모드가 지정됐지만 compose 명령(docker compose / docker-compose)을 찾지 못했습니다." >&2
+        exit 3
+      fi
+      if [[ -z "${compose_file}" ]]; then
+        echo "[ERROR] compose 모드가 지정됐지만 compose 파일을 찾지 못했습니다. 확인 순서: ${COMPOSE_FILES[*]}" >&2
+        exit 3
+      fi
+
+      read -r -a compose_cmd_arr <<<"${compose_cmd}"
+      if (cd "${PROJECT_ROOT}" && "${compose_cmd_arr[@]}" -f "${compose_file}" ps --status running --services 2>/dev/null | grep -Fxq "${SERVICE_NAME}"); then
+        echo "[INFO] compose exec 모드로 업데이트 실행: service=${SERVICE_NAME}, file=${compose_file}"
+        local -a cmd=("${compose_cmd_arr[@]}" -f "${compose_file}" exec -T "${SERVICE_NAME}" bash -lc "${UPDATE_COMMAND}")
+        log_command "${cmd[@]}"
+        (
+          cd "${PROJECT_ROOT}"
+          "${cmd[@]}"
+        )
         return
       fi
 
-      echo "[INFO] compose run 모드로 업데이트 실행: service=${SERVICE_NAME}"
-      cd "${PROJECT_ROOT}"
-      ${compose_cmd} run --rm -T "${SERVICE_NAME}" bash -lc "${UPDATE_COMMAND}"
+      echo "[INFO] compose run 모드로 업데이트 실행: service=${SERVICE_NAME}, file=${compose_file}"
+      local -a cmd=("${compose_cmd_arr[@]}" -f "${compose_file}" run --rm -T "${SERVICE_NAME}" bash -lc "${UPDATE_COMMAND}")
+      log_command "${cmd[@]}"
+      (
+        cd "${PROJECT_ROOT}"
+        "${cmd[@]}"
+      )
       return
-    elif [[ "${MODE}" == "compose" ]]; then
-      echo "[ERROR] compose 모드가 지정됐지만 compose 파일 또는 명령을 찾지 못했습니다." >&2
-      exit 3
-    fi
-  fi
+      ;;
 
-  if [[ "${MODE}" == "docker-exec" || "${MODE}" == "auto" ]]; then
-    if docker ps --format '{{.Names}}' | grep -Fxq "${CONTAINER_NAME}"; then
-      echo "[INFO] docker exec 모드로 업데이트 실행: container=${CONTAINER_NAME}"
-      docker exec "${CONTAINER_NAME}" bash -lc "cd /app && ${UPDATE_COMMAND}"
-      return
-    elif [[ "${MODE}" == "docker-exec" ]]; then
+    docker-exec)
+      if has_running_container; then
+        echo "[INFO] docker exec 모드로 업데이트 실행: container=${CONTAINER_NAME}"
+        local -a cmd=(docker exec "${CONTAINER_NAME}" bash -lc "cd /app && ${UPDATE_COMMAND}")
+        log_command "${cmd[@]}"
+        "${cmd[@]}"
+        return
+      fi
+
       echo "[ERROR] docker-exec 모드가 지정됐지만 실행 중인 컨테이너를 찾지 못했습니다: ${CONTAINER_NAME}" >&2
+      echo "[INFO] 현재 실행 중인 컨테이너 목록:" >&2
+      show_running_containers >&2 || true
       exit 4
-    fi
-  fi
+      ;;
 
-  if [[ "${MODE}" == "docker-run" || "${MODE}" == "auto" ]]; then
-    echo "[INFO] docker run 모드로 업데이트 실행: image=${DOCKER_IMAGE}"
-    local env_args=()
-    if [[ -f "${ENV_FILE_DEFAULT}" ]]; then
-      env_args+=(--env-file "${ENV_FILE_DEFAULT}")
-    fi
+    docker-run)
+      echo "[INFO] docker run 모드로 업데이트 실행: image=${DOCKER_IMAGE}"
+      declare -a env_args=()
+      declare -a volume_args=()
+      declare -a workdir_args=()
 
-    docker run --rm \
-      -v "${PROJECT_ROOT}:/app" \
-      -w /app \
-      "${env_args[@]}" \
-      "${DOCKER_IMAGE}" \
-      bash -lc "npm ci --ignore-scripts --no-audit --no-fund && ${UPDATE_COMMAND}"
-    return
-  fi
+      if [[ -f "${ENV_FILE_DEFAULT}" ]]; then
+        env_args+=(--env-file "${ENV_FILE_DEFAULT}")
+      fi
+      volume_args+=(-v "${PROJECT_ROOT}:/app")
+      workdir_args+=(-w "/app")
 
-  echo "[ERROR] 지원되지 않는 mode 값입니다: ${MODE}" >&2
-  exit 2
+      local -a cmd=(
+        docker run --rm
+        "${volume_args[@]}"
+        "${workdir_args[@]}"
+        "${env_args[@]}"
+        "${DOCKER_IMAGE}"
+        bash -lc "npm ci --ignore-scripts --no-audit --no-fund && ${UPDATE_COMMAND}"
+      )
+      log_command "${cmd[@]}"
+      "${cmd[@]}"
+      return
+      ;;
+
+    *)
+      echo "[ERROR] 지원되지 않는 mode 값입니다: ${selected_mode}" >&2
+      exit 2
+      ;;
+  esac
 }
 
 main() {

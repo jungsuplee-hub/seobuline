@@ -48,9 +48,43 @@ export async function getTimelineItems() {
 }
 
 export async function getPoliticianItems() {
-  const rows = db.prepare("SELECT * FROM politicians ORDER BY id DESC").all() as Array<Record<string, unknown>>;
+  let rows = db.prepare("SELECT * FROM politicians ORDER BY id DESC").all() as Array<Record<string, unknown>>;
   if (!rows.length) {
-    return readJsonFile<typeof politicianItems>("politicians.json", politicianItems);
+    const fallback = await readJsonFile<typeof politicianItems>("politicians.json", politicianItems);
+    if (fallback.length) {
+      const insert = db.prepare(`INSERT INTO politicians (
+        name, party, district, office_type, region_tags, summary, stance_or_relevance, election_2026_status,
+        source_name, source_url, official_website, x_url, blog_url, office_phone, image_url, is_visible
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+      const syncFallback = db.transaction((items: typeof fallback) => {
+        for (const item of items) {
+          const imageUrl = "image_url" in item && item.image_url ? String(item.image_url).trim() : null;
+          insert.run(
+            String(item.name || "").trim(),
+            String(item.party || "").trim(),
+            String(item.district || "").trim(),
+            String(item.office_type || "").trim(),
+            ((item.region_tags || []).map((tag) => String(tag).trim()).filter(Boolean)).join(","),
+            String(item.summary || "").trim(),
+            String(item.stance_or_relevance || item.summary || "").trim(),
+            String(item.election_2026_status || "공개 확인 자료 없음").trim(),
+            String(item.source_name || "관리자 등록").trim() || null,
+            String(item.source_url || "").trim() || null,
+            item.official_website ? String(item.official_website).trim() : null,
+            item.x_url ? String(item.x_url).trim() : null,
+            item.blog_url ? String(item.blog_url).trim() : null,
+            item.office_phone ? String(item.office_phone).trim() : null,
+            imageUrl,
+            item.is_visible === false ? 0 : 1,
+          );
+        }
+      });
+      syncFallback(fallback);
+      rows = db.prepare("SELECT * FROM politicians ORDER BY id DESC").all() as Array<Record<string, unknown>>;
+    }
+  }
+  if (!rows.length) {
+    return [];
   }
   return rows.map((row) => ({
     id: Number(row.id || 0),

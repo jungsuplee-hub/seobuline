@@ -29,6 +29,7 @@ export function initDb() {
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
       nickname TEXT,
+      role TEXT NOT NULL DEFAULT 'user',
       region TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -48,6 +49,7 @@ export function initDb() {
       category TEXT,
       title TEXT NOT NULL,
       content TEXT NOT NULL,
+      image_urls TEXT,
       author_id INTEGER NOT NULL,
       region TEXT,
       view_count INTEGER NOT NULL DEFAULT 0,
@@ -55,6 +57,14 @@ export function initDb() {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS post_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_id INTEGER NOT NULL,
+      file_url TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS comments (
@@ -71,6 +81,7 @@ export function initDb() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       content TEXT NOT NULL,
+      image_url TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -81,6 +92,7 @@ export function initDb() {
       summary TEXT NOT NULL,
       source_url TEXT NOT NULL,
       category TEXT NOT NULL,
+      image_url TEXT,
       published_date TEXT NOT NULL,
       is_featured INTEGER NOT NULL DEFAULT 0
     );
@@ -96,6 +108,7 @@ export function initDb() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       description TEXT NOT NULL,
+      image_url TEXT,
       timeline_date TEXT NOT NULL,
       status TEXT NOT NULL,
       sort_order INTEGER NOT NULL DEFAULT 0
@@ -108,6 +121,7 @@ export function initDb() {
       district TEXT,
       office_type TEXT,
       summary TEXT,
+      image_url TEXT,
       source_url TEXT
     );
 
@@ -116,7 +130,15 @@ export function initDb() {
       title TEXT NOT NULL,
       url TEXT NOT NULL,
       category TEXT,
+      thumbnail_url TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS site_content (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      about_content TEXT,
+      image_url TEXT,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS site_stats (
@@ -137,16 +159,27 @@ export function initDb() {
 
     CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
     CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_post_images_post_id ON post_images(post_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
     CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_token ON password_reset_tokens(token);
   `);
 
+  addColumnIfMissing("users", "role", "role TEXT NOT NULL DEFAULT 'user'");
   addColumnIfMissing("posts", "view_count", "view_count INTEGER NOT NULL DEFAULT 0");
+  addColumnIfMissing("posts", "image_urls", "image_urls TEXT");
+  addColumnIfMissing("notices", "image_url", "image_url TEXT");
+  addColumnIfMissing("news_articles", "image_url", "image_url TEXT");
+  addColumnIfMissing("timeline_items", "image_url", "image_url TEXT");
+  addColumnIfMissing("politicians", "image_url", "image_url TEXT");
+  addColumnIfMissing("resources", "thumbnail_url", "thumbnail_url TEXT");
+
   db.prepare(
     `INSERT INTO site_stats (key, value, updated_at)
      VALUES ('home_view_count', 0, CURRENT_TIMESTAMP)
      ON CONFLICT(key) DO NOTHING`,
   ).run();
+
+  db.prepare("INSERT INTO site_content (id, about_content) VALUES (1, '') ON CONFLICT(id) DO NOTHING").run();
 
   initialized = true;
 }

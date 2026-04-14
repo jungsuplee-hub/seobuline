@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirectWithForwardedHeaders } from "@/lib/request";
+import { parseImageUrls } from "@/lib/upload";
 
 const postSchema = z.object({
   title: z.string().trim().min(1, "제목을 입력해 주세요.").max(120, "제목은 120자 이하여야 합니다."),
@@ -14,7 +15,7 @@ const postSchema = z.object({
 export async function GET() {
   const items = db
     .prepare(
-      `SELECT p.id, p.title, p.content, p.created_at, p.region, p.category, p.author_id, p.view_count, u.nickname, u.email
+      `SELECT p.id, p.title, p.content, p.image_urls, p.created_at, p.region, p.category, p.author_id, p.view_count, u.nickname, u.email
        FROM posts p
        JOIN users u ON u.id = p.author_id
        WHERE p.is_deleted = 0
@@ -29,7 +30,8 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return redirectWithForwardedHeaders(req, `/login?next=${encodeURIComponent("/board/new")}`);
 
-  const payload = Object.fromEntries((await req.formData()).entries());
+  const formData = await req.formData();
+  const payload = Object.fromEntries(formData.entries());
   const parsed = postSchema.safeParse({
     title: payload.title,
     content: payload.content,
@@ -42,9 +44,10 @@ export async function POST(req: Request) {
     return redirectWithForwardedHeaders(req, `/board/new?error=${encodeURIComponent(message)}`);
   }
 
+  const imageUrls = parseImageUrls(formData.get("image_urls"));
   const result = db
-    .prepare("INSERT INTO posts (title, content, region, category, author_id) VALUES (?, ?, ?, ?, ?)")
-    .run(parsed.data.title, parsed.data.content, parsed.data.region, parsed.data.category, user.id);
+    .prepare("INSERT INTO posts (title, content, region, category, image_urls, author_id) VALUES (?, ?, ?, ?, ?, ?)")
+    .run(parsed.data.title, parsed.data.content, parsed.data.region, parsed.data.category, JSON.stringify(imageUrls), user.id);
 
   return redirectWithForwardedHeaders(req, `/board/${String(result.lastInsertRowid)}`);
 }

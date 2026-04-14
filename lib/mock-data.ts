@@ -1,6 +1,74 @@
-import type { NewsArticle, Notice } from "@/types";
-export const notices: Notice[]=[{id:"n1",title:"서부선 정상화 주민설명회 안내",content:"4월 30일 주민설명회를 개최합니다.",is_pinned:true,created_at:"2026-04-01"},{id:"n2",title:"제보 게시판 운영 가이드",content:"사실 확인 가능한 제보만 등록",is_pinned:false,created_at:"2026-03-28"},{id:"n3",title:"개인정보 처리방침 개정",content:"정책 문서 개정",is_pinned:false,created_at:"2026-03-22"}];
-export const news: NewsArticle[]=[{id:"a1",title:"서부선 재추진 관련 시 협의 본격화",source_name:"서울정책일보",summary:"재정/노선 검토 실무협의 시작",source_url:"https://example.com/news/1",category:"정책",published_date:"2026-04-10",is_featured:true},{id:"a2",title:"주민교통 불편 해소 기대감",source_name:"도시교통뉴스",summary:"연계교통 개선 및 환승편의 강화",source_url:"https://example.com/news/2",category:"지역",published_date:"2026-04-09",is_featured:false},{id:"a3",title:"서부권 균형발전 핵심 과제",source_name:"공공포커스",summary:"도시균형발전 관점에서 필요성 강조",source_url:"https://example.com/news/3",category:"분석",published_date:"2026-04-08",is_featured:false},{id:"a4",title:"추진위원회 공개자료 아카이브 공개",source_name:"시민브리프",summary:"정치인 발언 및 공개 공문 체계화",source_url:"https://example.com/news/4",category:"위원회",published_date:"2026-04-06",is_featured:false},{id:"a5",title:"노선도 개선 의견수렴 시작",source_name:"메트로타임즈",summary:"온라인 의견 수렴 채널 오픈",source_url:"https://example.com/news/5",category:"참여",published_date:"2026-04-04",is_featured:true}];
-export const timeline=[{id:"t1",title:"사업 재검토 착수",description:"기초 타당성 재정비",timeline_date:"2025-12-01",status:"완료"},{id:"t2",title:"관계기관 협의",description:"예산 및 일정 조율",timeline_date:"2026-02-15",status:"협의중"},{id:"t3",title:"주민 공청회",description:"지역 의견 수렴",timeline_date:"2026-04-30",status:"추진중"},{id:"t4",title:"최종 실행계획 확정",description:"실행 로드맵 공표",timeline_date:"2026-07-20",status:"검토중"}];
-export const posts=Array.from({length:5}).map((_,i)=>({id:`p${i+1}`,title:`주민 의견 공유 ${i+1}`,author:"시민",created_at:`2026-04-0${i+4}`,category:i%2?"자유게시판":"지역별 게시판"}));
-export const faqItems=[{q:"서부선 사업은 언제 착공되나요?",a:"공식 확정 이후 공지됩니다."},{q:"뉴스는 누가 등록하나요?",a:"관리자 권한으로 등록/검수합니다."},{q:"정치인 정보 등록 기준은?",a:"공개 출처 기반 자료만 허용합니다."},{q:"비회원도 게시판을 볼 수 있나요?",a:"열람은 가능, 작성은 회원만 가능합니다."}];
+import type { Notice } from "@/types";
+
+export const notices: Notice[] = [
+  {
+    id: "n1",
+    title: "서부선 정상화 주민설명회 안내",
+    content: "4월 30일 주민설명회를 개최합니다.",
+    is_pinned: true,
+    created_at: "2026-04-01",
+  },
+  {
+    id: "n2",
+    title: "제보 게시판 운영 가이드",
+    content: "사실 확인 가능한 제보만 등록",
+    is_pinned: false,
+    created_at: "2026-03-28",
+  },
+  {
+    id: "n3",
+    title: "개인정보 처리방침 개정",
+    content: "정책 문서 개정",
+    is_pinned: false,
+    created_at: "2026-03-22",
+  },
+];
+
+export const timeline = [
+  {
+    id: "t1",
+    title: "사업 재검토 착수",
+    description: "기초 타당성 재정비",
+    timeline_date: "2025-12-01",
+    status: "완료",
+  },
+  {
+    id: "t2",
+    title: "관계기관 협의",
+    description: "예산 및 일정 조율",
+    timeline_date: "2026-02-15",
+    status: "협의중",
+  },
+  {
+    id: "t3",
+    title: "주민 공청회",
+    description: "지역 의견 수렴",
+    timeline_date: "2026-04-30",
+    status: "추진중",
+  },
+  {
+    id: "t4",
+    title: "최종 실행계획 확정",
+    description: "실행 로드맵 공표",
+    timeline_date: "2026-07-20",
+    status: "검토중",
+  },
+];
+
+export const posts = Array.from({ length: 5 }).map((_, i) => ({
+  id: `p${i + 1}`,
+  title: `주민 의견 공유 ${i + 1}`,
+  author: "시민",
+  created_at: `2026-04-0${i + 4}`,
+  category: i % 2 ? "자유게시판" : "지역별 게시판",
+}));
+
+export const faqItems = [
+  { q: "서부선 사업은 언제 착공되나요?", a: "공식 확정 이후 공지됩니다." },
+  { q: "뉴스는 누가 등록하나요?", a: "관리자 권한으로 등록/검수합니다." },
+  { q: "정치인 정보 등록 기준은?", a: "공개 출처 기반 자료만 허용합니다." },
+  {
+    q: "비회원도 게시판을 볼 수 있나요?",
+    a: "열람은 가능, 작성은 회원만 가능합니다.",
+  },
+];

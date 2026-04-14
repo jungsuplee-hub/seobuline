@@ -12,7 +12,7 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   const form = await req.formData();
-  db.prepare("UPDATE news_articles SET title=?, source_name=?, summary=?, source_url=?, category=?, image_url=?, published_date=? WHERE id = ?").run(
+  db.prepare("UPDATE news_articles SET title=?, source_name=?, summary=?, source_url=?, category=?, image_url=?, published_date=?, is_featured=? WHERE id = ?").run(
     String(form.get("title") || "").trim(),
     String(form.get("source_name") || "").trim(),
     String(form.get("summary") || "").trim(),
@@ -20,6 +20,7 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
     String(form.get("category") || "").trim(),
     String(form.get("image_url") || "").trim() || null,
     String(form.get("published_date") || "").trim(),
+    form.get("is_featured") ? 1 : 0,
     id,
   );
   return redirectWithForwardedHeaders(req, "/news");

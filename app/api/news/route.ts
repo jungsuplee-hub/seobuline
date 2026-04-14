@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const sourceUrl = String(form.get("source_url") || "").trim() || `local-${Date.now()}`;
   const id = createNewsId(sourceUrl + String(Date.now()));
-  db.prepare("INSERT INTO news_articles (id, title, source_name, summary, source_url, category, image_url, published_date, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)").run(
+  db.prepare("INSERT INTO news_articles (id, title, source_name, summary, source_url, category, image_url, published_date, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(
     id,
     String(form.get("title") || "").trim(),
     String(form.get("source_name") || "관리자"),
@@ -49,6 +49,7 @@ export async function POST(req: Request) {
     String(form.get("category") || "일반"),
     String(form.get("image_url") || "").trim() || null,
     String(form.get("published_date") || new Date().toISOString().slice(0, 10)),
+    form.get("is_featured") ? 1 : 0,
   );
 
   return redirectWithForwardedHeaders(req, "/news");

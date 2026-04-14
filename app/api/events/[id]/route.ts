@@ -12,11 +12,13 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   const form = await req.formData();
-  db.prepare("UPDATE timeline_items SET title=?, description=?, timeline_date=?, status=?, sort_order=?, image_url=? WHERE id=?").run(
+  db.prepare("UPDATE timeline_items SET title=?, description=?, timeline_date=?, status=?, source_name=?, source_url=?, sort_order=?, image_url=? WHERE id=?").run(
     String(form.get("title") || "").trim(),
     String(form.get("description") || "").trim(),
     String(form.get("timeline_date") || "").trim(),
     String(form.get("status") || "").trim(),
+    String(form.get("source_name") || "").trim() || null,
+    String(form.get("source_url") || "").trim() || null,
     Number(form.get("sort_order") || 0),
     String(form.get("image_url") || "").trim() || null,
     id,

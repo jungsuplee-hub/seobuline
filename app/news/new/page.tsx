@@ -16,6 +16,7 @@ export default async function NewNewsPage() {
         <input name="source_url" placeholder="원문 URL" required className="w-full" />
         <input name="category" placeholder="카테고리" defaultValue="일반" className="w-full" />
         <input type="date" name="published_date" defaultValue={new Date().toISOString().slice(0, 10)} className="w-full" />
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="is_featured" value="1" /> 대표 노출</label>
         <textarea name="summary" placeholder="요약" className="min-h-24 w-full" required />
         <AdminImageInput scope="news" />
         <button className="rounded bg-[#d0a453] px-3 py-2 font-semibold text-[#1e1610]">등록</button>

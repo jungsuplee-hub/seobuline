@@ -49,18 +49,22 @@ export function HeroSection() {
 export async function HomeGrid({ userCount, homeViewCount }: { userCount: number; homeViewCount: number }) {
   const news = await getNews();
 
+  const metricCards: Array<{ text: string; href: "/" | "/news" | "/notices" | "/join" }> = [
+    { text: `최신 뉴스 ${news.length}건`, href: "/news" },
+    { text: `최근 공지 ${notices.length}건`, href: "/notices" },
+    { text: `가입 회원 수 ${userCount}명`, href: "/join" },
+    { text: `홈페이지 조회수 ${homeViewCount}회`, href: "/" },
+  ];
+
   return (
     <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-      {[
-        `최신 뉴스 ${news.length}건`,
-        `최근 공지 ${notices.length}건`,
-        `가입 회원 수 ${userCount}명`,
-        `홈페이지 조회수 ${homeViewCount}회`,
-      ].map((text) => (
-        <Card key={text}>
-          <p className="text-xs text-[#cab898]">핵심 지표</p>
-          <p className="mt-1 text-xl font-semibold">{text}</p>
-        </Card>
+      {metricCards.map((item) => (
+        <Link key={item.text} href={item.href} className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d0a453]/70">
+          <Card className="h-full transition hover:border-[#d0a453]/55 hover:bg-[#182233]">
+            <p className="text-xs text-[#cab898]">핵심 지표</p>
+            <p className="mt-1 text-xl font-semibold group-hover:text-[#f7d899]">{item.text}</p>
+          </Card>
+        </Link>
       ))}
     </div>
   );
@@ -79,11 +83,18 @@ export function NeedSection() {
         </ul>
       </Card>
       <Card>
-        <h2 className="text-xl font-semibold">운영 원칙</h2>
+        <h2 className="text-xl font-semibold">연결성 시각 섹션</h2>
+        <Image
+          src="/assets/connectivity-panel.svg"
+          alt="서부권 지역 연결성 설명 이미지"
+          width={900}
+          height={700}
+          className="mt-3 h-auto w-full rounded-lg border border-[#d0a453]/20"
+        />
         <ul className="mt-4 space-y-3 text-sm text-[#dfcfb5]">
-          <li>• 뉴스/정치인/진행현황은 공개 출처와 수동 검수 데이터 중심으로 갱신합니다.</li>
-          <li>• 루머/비공식 자료를 배제하고 원문 링크를 함께 제공합니다.</li>
-          <li>• 오픈채팅·게시판을 통해 주민 제보를 수집하고 사실 확인 후 반영합니다.</li>
+          <li>• 이미지 중심으로 노선 필요성과 생활권 연결 구조를 설명합니다.</li>
+          <li>• 장식 목적 그래프 대신, 환승·연결·생활권 정보를 우선 배치합니다.</li>
+          <li>• 텍스트 가독성을 위해 오버레이/대비가 높은 스타일을 유지합니다.</li>
         </ul>
       </Card>
     </section>
@@ -149,8 +160,8 @@ export async function HomeLists() {
       <Card>
         <h2 className="font-semibold">정치인 정보 바로가기</h2>
         <ul className="mt-3 space-y-2 text-sm">
-          {politicianItems.slice(0, 4).map((item) => (
-            <li key={item.name}>
+          {politicianItems.slice(0, 6).map((item) => (
+            <li key={`${item.name}-${item.office_type}`}>
               <Link href={`/politicians?query=${encodeURIComponent(item.name)}`} className="block rounded px-1 py-2 hover:bg-[#1b2431] hover:text-[#f7d899] focus:bg-[#1b2431] focus:text-[#f7d899]">
                 {item.name} · {item.office_type}
               </Link>

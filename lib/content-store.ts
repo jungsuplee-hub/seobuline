@@ -130,6 +130,29 @@ export function getRouteMapImageUrl() {
   return row?.route_map_image_url ?? null;
 }
 
+export function getRouteMapImageUrls() {
+  const row = db.prepare("SELECT route_map_image_url, route_map_image_urls FROM site_content WHERE id = 1").get() as
+    | { route_map_image_url: string | null; route_map_image_urls: string | null }
+    | undefined;
+  if (!row) return [] as string[];
+
+  if (row.route_map_image_urls?.trim()) {
+    try {
+      const parsed = JSON.parse(row.route_map_image_urls) as unknown;
+      if (Array.isArray(parsed)) {
+        return parsed
+          .filter((item): item is string => typeof item === "string")
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+    } catch {
+      // ignore invalid data and fallback to legacy single value
+    }
+  }
+
+  return row.route_map_image_url?.trim() ? [row.route_map_image_url.trim()] : [];
+}
+
 export async function getTimelineItems(): Promise<TimelineItem[]> {
   const rows = db.prepare("SELECT id, title, description, timeline_date, status, source_name, source_url, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
   if (!rows.length) {

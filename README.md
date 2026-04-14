@@ -72,11 +72,14 @@ docker run --rm -p 5050:5050 -e SESSION_SECRET=change-me seobuline
 chmod +x scripts/run-update-in-docker.sh
 ```
 
-`scripts/run-update-in-docker.sh`는 다음 순서로 자동 시도합니다.
-1. `docker compose exec -T app` (서비스가 이미 실행 중인 경우)
-2. `docker compose run --rm -T app`
-3. `docker exec seobuline-app`
-4. `docker run --rm ... node:20-bookworm-slim`
+`scripts/run-update-in-docker.sh`의 auto 모드는 아래 우선순위로 실행 방식을 선택합니다.
+1. compose 명령/파일을 찾을 수 있으면 `compose`
+2. 실행 중 컨테이너(`SEOBULINE_CONTAINER_NAME`)가 있으면 `docker-exec`
+3. 그 외에는 `docker-run`
+
+`compose` 모드에서는 다음 순서로 탐지합니다.
+- compose 명령: `docker compose` → `docker-compose`
+- compose 파일: `compose.yaml` → `compose.yml` → `docker-compose.yml` → `docker-compose.yaml`
 
 기본값은 환경변수로 변경할 수 있습니다.
 - `SEOBULINE_UPDATE_MODE=auto|compose|docker-exec|docker-run`
@@ -88,6 +91,16 @@ chmod +x scripts/run-update-in-docker.sh
 ```bash
 cd /opt/seobuline
 ./scripts/run-update-in-docker.sh
+```
+
+컨테이너 이름 확인(단일 Docker 환경):
+```bash
+docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}'
+```
+
+환경 점검 스크립트:
+```bash
+./scripts/diagnose-update-env.sh
 ```
 
 ### cron 등록 (Docker compose)

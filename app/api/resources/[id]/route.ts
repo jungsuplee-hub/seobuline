@@ -8,11 +8,15 @@ async function checkAdmin() {
   return Boolean(user && (user.role === "admin" || user.role === "moderator" || user.role === "manager"));
 }
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const { id } = await params;
-  const form = await req.formData();
-  const fileUrl = String(form.get("file_url") || "").trim();
+function normalizeExternalUrl(value: FormDataEntryValue | null) {
+  const url = String(value || "").trim();
+  if (!url || url.toUpperCase() === "N/A") return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  return "";
+}
+
+async function updateResourceByForm(id: string, form: FormData) {
+  const fileUrl = normalizeExternalUrl(form.get("file_url"));
   const uploadedAttachmentUrl = String(form.get("thumbnail_url") || "").trim();
   const resolvedUrl = fileUrl || uploadedAttachmentUrl;
   db.prepare("UPDATE resources SET title=?, url=?, file_url=?, description=?, category=?, thumbnail_url=?, published_date=? WHERE id=?").run(
@@ -25,6 +29,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     String(form.get("published_date") || "").trim() || null,
     id,
   );
+}
+
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }, parsedForm?: FormData) {
+  if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const { id } = await params;
+  const form = parsedForm || (await req.formData());
+  await updateResourceByForm(id, form);
   return redirectWithForwardedHeaders(req, "/resources");
 }
 
@@ -36,8 +47,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const form = Object.fromEntries((await req.formData()).entries());
+  const parsedForm = await req.formData();
+  const form = Object.fromEntries(parsedForm.entries());
   const method = String(form._method || "PATCH").toUpperCase();
   if (method === "DELETE") return DELETE(req, { params });
-  return PATCH(req, { params });
+  return PATCH(req, { params }, parsedForm);
 }

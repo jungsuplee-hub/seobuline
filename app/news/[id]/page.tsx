@@ -1,3 +1,48 @@
-import type { Metadata } from "next";import { news } from "@/lib/mock-data";
-export async function generateMetadata({params}:{params:Promise<{id:string}>}):Promise<Metadata>{const {id}=await params;const a=news.find(n=>n.id===id);return {title:a?.title??"뉴스 상세",description:a?.summary,openGraph:{title:a?.title,description:a?.summary}};}
-export default async function NewsDetailPage({params}:{params:Promise<{id:string}>}){const {id}=await params;const a=news.find(n=>n.id===id);if(!a) return <div>존재하지 않는 기사입니다.</div>;return <article className="space-y-3"><h1 className="text-2xl font-bold">{a.title}</h1><p className="text-sm">{a.source_name} · {a.published_date}</p><p>{a.summary}</p><a href={a.source_url} target="_blank" className="text-primary underline">원문 보기</a></article>;}
+import type { Metadata } from "next";
+import { getNewsById } from "@/lib/news-store";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const article = await getNewsById(id);
+
+  return {
+    title: article?.title ?? "뉴스 상세",
+    description: article?.summary,
+    openGraph: {
+      title: article?.title,
+      description: article?.summary,
+    },
+  };
+}
+
+export default async function NewsDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const article = await getNewsById(id);
+
+  if (!article) {
+    return <div>존재하지 않는 기사입니다.</div>;
+  }
+
+  return (
+    <article className="space-y-3">
+      <h1 className="text-2xl font-bold">{article.title}</h1>
+      <p className="text-sm">
+        {article.source_name} · {article.published_date}
+      </p>
+      <p>{article.summary}</p>
+      <a href={article.source_url} target="_blank" className="text-primary underline">
+        원문 보기
+      </a>
+    </article>
+  );
+}

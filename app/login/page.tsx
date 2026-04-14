@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -41,6 +42,11 @@ export default function LoginPage() {
         <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호" required minLength={8} />
         {error && <p className="text-sm text-red-300">{error}</p>}
+        <div className="text-right text-sm">
+          <Link href="/forgot-password" className="underline hover:text-[#f7d899] focus:text-[#f7d899]">
+            비밀번호를 잊으셨나요? 비밀번호 초기화
+          </Link>
+        </div>
         <Button type="submit" className="w-full">로그인</Button>
       </form>
     </Card>

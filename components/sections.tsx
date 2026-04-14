@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -89,10 +90,66 @@ export async function HomeLists() {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <Card><h2 className="font-semibold">진행현황 요약</h2><ul className="mt-3 space-y-2 text-sm">{timelineItems.slice(0,4).map((item)=><li key={item.title}>{item.status} · {item.title}</li>)}</ul></Card>
-      <Card><h2 className="font-semibold">최신 뉴스</h2><ul className="mt-3 space-y-2 text-sm">{news.slice(0,5).map((n)=><li key={n.id}>{n.published_date} · {n.title}</li>)}</ul></Card>
-      <Card><h2 className="font-semibold">최근 공지</h2><ul className="mt-3 space-y-2 text-sm">{notices.slice(0,3).map((n)=><li key={n.id}>{n.title}</li>)}</ul></Card>
-      <Card><h2 className="font-semibold">게시판 최신글</h2><ul className="mt-3 space-y-2 text-sm">{latestPosts.map((p)=><li key={p.id}>{p.title}</li>)}</ul></Card>
+      <Card>
+        <h2 className="font-semibold">진행현황 요약</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {timelineItems.slice(0, 4).map((item) => (
+            <li key={item.title}>
+              <Link href="/status" className="block rounded px-1 py-1 hover:bg-[#1b2431] hover:text-[#f7d899] focus:bg-[#1b2431] focus:text-[#f7d899]">
+                {item.status} · {item.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card>
+        <h2 className="font-semibold">최신 뉴스</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {news.slice(0, 5).map((n) => (
+            <li key={n.id}>
+              <Link href={`/news/${n.id}`} className="block rounded px-1 py-1 hover:bg-[#1b2431] hover:text-[#f7d899] focus:bg-[#1b2431] focus:text-[#f7d899]">
+                {n.published_date} · {n.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card>
+        <h2 className="font-semibold">최근 공지</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {notices.slice(0, 3).map((n) => (
+            <li key={n.id}>
+              <Link href={`/notices/${n.id}`} className="block rounded px-1 py-1 hover:bg-[#1b2431] hover:text-[#f7d899] focus:bg-[#1b2431] focus:text-[#f7d899]">
+                {n.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card>
+        <h2 className="font-semibold">게시판 최신글</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {latestPosts.map((p) => (
+            <li key={p.id}>
+              <Link href={`/board/${p.id}`} className="block rounded px-1 py-1 hover:bg-[#1b2431] hover:text-[#f7d899] focus:bg-[#1b2431] focus:text-[#f7d899]">
+                {p.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card>
+        <h2 className="font-semibold">정치인 정보 바로가기</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {politicianItems.slice(0, 4).map((item) => (
+            <li key={item.name}>
+              <Link href={`/politicians?query=${encodeURIComponent(item.name)}`} className="block rounded px-1 py-2 hover:bg-[#1b2431] hover:text-[#f7d899] focus:bg-[#1b2431] focus:text-[#f7d899]">
+                {item.name} · {item.office_type}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
     </div>
   );
 }

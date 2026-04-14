@@ -1,14 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { politicianItems } from "@/lib/public-data";
 
 export default function PoliticiansPage() {
+  const searchParams = useSearchParams();
   const [region, setRegion] = useState("all");
   const [office, setOffice] = useState("all");
   const [party, setParty] = useState("all");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(searchParams.get("query") || "");
 
   const visibleItems = useMemo(() => politicianItems.filter((item) => item.is_visible), []);
 

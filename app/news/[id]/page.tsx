@@ -1,49 +1,33 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getNewsById } from "@/lib/news-store";
+import { getCurrentUser } from "@/lib/auth";
+import { canManageContent } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const article = await getNewsById(id);
-
-  return {
-    title: article?.title ?? "뉴스 상세",
-    description: article?.summary,
-    openGraph: {
-      title: article?.title,
-      description: article?.summary,
-    },
-  };
+  return { title: article?.title ?? "뉴스 상세", description: article?.summary };
 }
 
-export default async function NewsDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const article = await getNewsById(id);
-
-  if (!article) {
-    return <div>존재하지 않는 기사입니다.</div>;
-  }
+  const [article, user] = await Promise.all([getNewsById(id), getCurrentUser()]);
+  if (!article) return <div>존재하지 않는 기사입니다.</div>;
+  const canManage = canManageContent(user);
 
   return (
     <article className="space-y-3">
-      <h1 className="text-2xl font-bold">{article.title}</h1>
-      <p className="text-sm">
-        {article.source_name} · {article.published_date}
-      </p>
+      <div className="flex items-start justify-between gap-2">
+        <h1 className="text-2xl font-bold">{article.title}</h1>
+        {canManage && <Link href={`/news/${id}/edit`} className="rounded border px-2 py-1 text-xs">수정</Link>}
+      </div>
+      <p className="text-sm">{article.source_name} · {article.published_date}</p>
       {article.image_url && <img src={article.image_url} alt="뉴스 이미지" className="w-full rounded-lg object-cover" />}
       <p>{article.summary}</p>
-      <a href={article.source_url} target="_blank" className="text-primary underline">
-        원문 보기
-      </a>
+      <a href={article.source_url} target="_blank" className="text-primary underline">원문 보기</a>
     </article>
   );
 }

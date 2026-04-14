@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   }
 
   const user = db.prepare("SELECT id, password_hash, role FROM users WHERE lower(trim(email)) = ?").get(email) as
-    | { id: number; password_hash: string; role: "user" | "moderator" | "admin" }
+    | { id: number; password_hash: string; role: "user" | "manager" | "moderator" | "admin" }
     | undefined;
 
   if (!user || !(await verifyPassword(password, user.password_hash))) {

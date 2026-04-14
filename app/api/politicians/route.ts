@@ -10,7 +10,7 @@ export async function GET(){
 
 export async function POST(req:Request){
   const user = await getCurrentUser();
-  if (!user || (user.role !== "admin" && user.role !== "moderator")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!user || (user.role !== "admin" && user.role !== "moderator" && user.role !== "manager")) return NextResponse.json({error:"Forbidden"},{status:403});
   const form = await req.formData();
   db.prepare("INSERT INTO politicians (name, party, district, office_type, summary, image_url, source_url) VALUES (?, ?, ?, ?, ?, ?, ?)").run(
     String(form.get("name") || "").trim(),
@@ -21,5 +21,5 @@ export async function POST(req:Request){
     String(form.get("image_url") || "").trim() || null,
     String(form.get("source_url") || "").trim() || null,
   );
-  return redirectWithForwardedHeaders(req, "/admin/politicians");
+  return redirectWithForwardedHeaders(req, "/politicians");
 }

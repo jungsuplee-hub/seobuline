@@ -1,1 +1,23 @@
-export default function AboutPage(){return <div className="space-y-3"><h1 className="text-2xl font-bold">추진위원회 소개</h1><p>설립 취지: 서부선 사업 정상화를 위한 주민 연대 활동.</p><p>운영 원칙: 허위정보 금지 · 비방/욕설 금지 · 개인정보 노출 금지 · 저작권 침해 금지 · 공개 출처 기반 정보 등록.</p><p>신고 접수 및 삭제 요청: 운영진 이메일 접수 후 검토 처리.</p><p><a href="#" className="text-primary underline">개인정보처리방침</a> · <a href="#" className="text-primary underline">이용약관</a></p></div>;}
+import Link from "next/link";
+import { db } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import { canManageContent } from "@/lib/permissions";
+
+export default async function AboutPage() {
+  const [user, row] = await Promise.all([
+    getCurrentUser(),
+    Promise.resolve(db.prepare("SELECT about_content, image_url FROM site_content WHERE id = 1").get() as { about_content: string | null; image_url: string | null } | undefined),
+  ]);
+  const canManage = canManageContent(user);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">추진위원회 소개</h1>
+        {canManage && <Link href="/introduce/edit" className="rounded border px-2 py-1 text-xs">수정</Link>}
+      </div>
+      {row?.image_url && <img src={row.image_url} alt="소개 이미지" className="w-full rounded-lg object-cover" />}
+      <p className="whitespace-pre-wrap">{row?.about_content || "소개 내용이 아직 등록되지 않았습니다."}</p>
+    </div>
+  );
+}

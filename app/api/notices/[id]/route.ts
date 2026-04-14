@@ -5,7 +5,7 @@ import { redirectWithForwardedHeaders } from "@/lib/request";
 
 async function checkAdmin() {
   const user = await getCurrentUser();
-  return Boolean(user && (user.role === "admin" || user.role === "moderator"));
+  return Boolean(user && (user.role === "admin" || user.role === "moderator" || user.role === "manager"));
 }
 
 export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
@@ -18,13 +18,13 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
     String(form.get("image_url") || "").trim() || null,
     id,
   );
-  return redirectWithForwardedHeaders(req, "/admin/notices");
+  return redirectWithForwardedHeaders(req, "/notices");
 }
 export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   db.prepare("DELETE FROM notices WHERE id = ?").run(id);
-  return redirectWithForwardedHeaders(req, "/admin/notices");
+  return redirectWithForwardedHeaders(req, "/notices");
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {

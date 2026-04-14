@@ -17,7 +17,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "admin" && user.role !== "moderator")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!user || (user.role !== "admin" && user.role !== "moderator" && user.role !== "manager")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const isJson = (req.headers.get("content-type") || "").includes("application/json");
   if (isJson) {
@@ -51,5 +51,5 @@ export async function POST(req: Request) {
     String(form.get("published_date") || new Date().toISOString().slice(0, 10)),
   );
 
-  return redirectWithForwardedHeaders(req, "/admin/news");
+  return redirectWithForwardedHeaders(req, "/news");
 }

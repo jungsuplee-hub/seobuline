@@ -1,4 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
+import { getCurrentUser } from "@/lib/auth";
+import { canManageContent } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { getSiteContent } from "@/lib/content-store";
@@ -13,7 +16,9 @@ const summaryCardTitles = [
 ] as const;
 
 export default async function IntroducePage() {
-  const { projectOverview, faqItems } = await getSiteContent();
+  const [site, user] = await Promise.all([getSiteContent(), getCurrentUser()]);
+  const { projectOverview, faqItems } = site;
+  const canManage = canManageContent(user);
 
   const summaryCardValues = [
     projectOverview.route_overview,
@@ -24,6 +29,7 @@ export default async function IntroducePage() {
 
   return (
     <div className="space-y-6">
+      {canManage && <div className="flex justify-end"><Link href="/introduce/edit" className="rounded bg-[#d0a453] px-3 py-2 text-sm font-semibold text-[#1e1610]">수정</Link></div>}
       <section className="relative overflow-hidden rounded-2xl border border-[#d0a453]/25">
         <Image
           src={(projectOverview as { hero_image_url?: string | null }).hero_image_url || "/assets/route-overview.svg"}

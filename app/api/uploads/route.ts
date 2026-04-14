@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   if (scope === "posts") {
     // all signed users can upload in board
   } else if (ADMIN_SCOPES.has(scope)) {
-    if (user.role !== "admin" && user.role !== "moderator") {
+    if (user.role !== "admin" && user.role !== "moderator" && user.role !== "manager") {
       return NextResponse.json({ error: "관리자 권한이 필요합니다." }, { status: 403 });
     }
   } else {

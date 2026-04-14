@@ -5,7 +5,7 @@ import { redirectWithForwardedHeaders } from "@/lib/request";
 
 async function checkAdmin() {
   const user = await getCurrentUser();
-  return Boolean(user && (user.role === "admin" || user.role === "moderator"));
+  return Boolean(user && (user.role === "admin" || user.role === "moderator" || user.role === "manager"));
 }
 
 export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
@@ -21,13 +21,13 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
     String(form.get("image_url") || "").trim() || null,
     id,
   );
-  return redirectWithForwardedHeaders(req, "/admin/timeline");
+  return redirectWithForwardedHeaders(req, "/status");
 }
 export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   db.prepare("DELETE FROM timeline_items WHERE id = ?").run(id);
-  return redirectWithForwardedHeaders(req, "/admin/timeline");
+  return redirectWithForwardedHeaders(req, "/status");
 }
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const form = Object.fromEntries((await req.formData()).entries());

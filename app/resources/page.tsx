@@ -10,6 +10,13 @@ function isImageUrl(url: string) {
   return /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(url);
 }
 
+function normalizeExternalUrl(url: string | null) {
+  const trimmed = String(url || "").trim();
+  if (!trimmed || trimmed.toUpperCase() === "N/A") return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return "";
+}
+
 export default async function ResourcesPage() {
   const [user, resources] = await Promise.all([
     getCurrentUser(),
@@ -26,11 +33,14 @@ export default async function ResourcesPage() {
           <h2 className="font-semibold">{resource.title}</h2>
           <p className="text-sm text-slate-500">{resource.category || "기타"} · {resource.published_date || resource.created_at}</p>
           {resource.description && <p className="mt-2 text-sm text-[#e8dcc9]">{resource.description}</p>}
-          {(resource.file_url || resource.url) ? (
-            <a className="mt-2 inline-block text-sm text-primary underline" href={resource.file_url || resource.url} target="_blank" rel="noreferrer">자료 보기</a>
-          ) : (
-            <p className="mt-2 text-xs text-[#cab898]">등록된 링크/파일이 없습니다.</p>
-          )}
+          {(() => {
+            const linkUrl = normalizeExternalUrl(resource.file_url) || normalizeExternalUrl(resource.url);
+            return linkUrl ? (
+              <a className="mt-2 inline-block text-sm text-primary underline" href={linkUrl} target="_blank" rel="noreferrer">자료 보기</a>
+            ) : (
+              <p className="mt-2 text-xs text-[#cab898]">등록된 링크/파일이 없습니다.</p>
+            );
+          })()}
           {canManage && <div className="mt-2"><Link href={`/resources/${resource.id}/edit`} className="rounded border px-2 py-1 text-xs">수정</Link></div>}
         </Card>
       ))}

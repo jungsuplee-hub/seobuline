@@ -64,27 +64,52 @@ docker run --rm -p 5050:5050 -e SESSION_SECRET=change-me seobuline
 ```
 
 ## 콘텐츠 정기 업데이트 (cron)
+> ⚠️ 중요: 호스트 OS에서 `npm run update:all`을 직접 실행하면 GLIBC/GLIBCXX/libstdc++ 버전 차이로 Node 실행이 실패할 수 있습니다.
+> 업데이트 작업은 반드시 **Docker 컨테이너 내부**에서 실행하세요.
+
+### 실행 스크립트
+```bash
+chmod +x scripts/run-update-in-docker.sh
+```
+
+`scripts/run-update-in-docker.sh`는 다음 순서로 자동 시도합니다.
+1. `docker compose exec -T app` (서비스가 이미 실행 중인 경우)
+2. `docker compose run --rm -T app`
+3. `docker exec seobuline-app`
+4. `docker run --rm ... node:20-bookworm-slim`
+
+기본값은 환경변수로 변경할 수 있습니다.
+- `SEOBULINE_UPDATE_MODE=auto|compose|docker-exec|docker-run`
+- `SEOBULINE_COMPOSE_SERVICE` (기본: `app`)
+- `SEOBULINE_CONTAINER_NAME` (기본: `seobuline-app`)
+- `SEOBULINE_DOCKER_IMAGE` (기본: `node:20-bookworm-slim`)
+
 ### 수동 실행
 ```bash
-npm run update:site-content
-npm run update:timeline
-npm run update:politicians
-npm run update:news
-npm run update:all
+cd /opt/seobuline
+./scripts/run-update-in-docker.sh
 ```
 
-### cron 등록 (서버)
+### cron 등록 (Docker compose)
 ```cron
-0 6 * * * cd /path/to/seobuline && npm run update:all >> /var/log/seobuline-cron.log 2>&1
+0 6 * * * cd /opt/seobuline && ./scripts/run-update-in-docker.sh --mode compose >> /var/log/seobuline-cron.log 2>&1
 ```
 
-또는 쉘 래퍼 사용:
+### cron 등록 (단일 Docker 컨테이너)
+```cron
+0 6 * * * cd /opt/seobuline && SEOBULINE_UPDATE_MODE=docker-exec SEOBULINE_CONTAINER_NAME=seobuline-app ./scripts/run-update-in-docker.sh >> /var/log/seobuline-cron.log 2>&1
+```
+
+### 로그 확인
 ```bash
-chmod +x scripts/run-cron-updates.sh
+tail -f /var/log/seobuline-cron.log
 ```
-```cron
-0 6 * * * cd /path/to/seobuline && ./scripts/run-cron-updates.sh >> /var/log/seobuline-cron.log 2>&1
-```
+
+### 장애 점검 체크리스트
+- 컨테이너/compose 서비스가 실행 중인지 (`docker ps`, `docker compose ps`)
+- compose 서비스명이 `app`이 맞는지
+- 환경변수 파일(`.env.local`)이 컨테이너에서 읽히는지
+- `data/` 볼륨(DB/콘텐츠 JSON) 마운트가 유지되는지
 
 상세 문서: `docs/content-update.md`, 예시 crontab: `deploy/example-crontab.txt`
 

@@ -14,7 +14,9 @@
     "update:politicians": "tsx scripts/update-politicians.ts",
     "update:timeline": "tsx scripts/update-timeline.ts",
     "update:site-content": "tsx scripts/update-site-content.ts",
-    "update:all": "tsx scripts/run-all-updates.ts"
+    "update:all": "tsx scripts/run-all-updates.ts",
+    "update:all:docker": "./scripts/run-update-in-docker.sh",
+    "update:all:compose": "./scripts/run-update-compose.sh"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

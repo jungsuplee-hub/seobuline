@@ -1,5 +1,12 @@
 # seobuline content updates (daily 06:00)
-0 6 * * * cd /path/to/seobuline && npm run update:all >> /var/log/seobuline-cron.log 2>&1
+# IMPORTANT: Do NOT run `npm run update:all` directly on host OS.
+# Run updates inside Docker container only.
 
-# alternatively, shell wrapper
-# 0 6 * * * cd /path/to/seobuline && ./scripts/run-cron-updates.sh >> /var/log/seobuline-cron.log 2>&1
+# 1) Docker Compose service name = app (recommended)
+0 6 * * * cd /opt/seobuline && ./scripts/run-update-in-docker.sh --mode compose >> /var/log/seobuline-cron.log 2>&1
+
+# 2) Single container mode (when container name is seobuline-app)
+# 0 6 * * * cd /opt/seobuline && SEOBULINE_UPDATE_MODE=docker-exec SEOBULINE_CONTAINER_NAME=seobuline-app ./scripts/run-update-in-docker.sh >> /var/log/seobuline-cron.log 2>&1
+
+# 3) Optional explicit flock at cron layer
+# 0 6 * * * flock -n /tmp/seobuline-update.lock -c 'cd /opt/seobuline && ./scripts/run-update-in-docker.sh --no-lock' >> /var/log/seobuline-cron.log 2>&1

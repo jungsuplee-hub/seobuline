@@ -40,7 +40,7 @@ export function getRouteMapImageUrl() {
 }
 
 export async function getTimelineItems() {
-  const rows = db.prepare("SELECT id, title, description, timeline_date, status, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
+  const rows = db.prepare("SELECT id, title, description, timeline_date, status, source_name, source_url, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
   if (!rows.length) {
     return readJsonFile<typeof timelineItems>("timeline.json", timelineItems);
   }
@@ -59,15 +59,17 @@ export async function getPoliticianItems() {
     district: String(row.district || ""),
     office_type: String(row.office_type || ""),
     summary: String(row.summary || ""),
-    stance_or_relevance: String(row.summary || ""),
-    region_tags: [String(row.district || "기타")],
-    election_2026_status: "공개 확인 자료 없음",
-    source_name: "관리자 등록",
+    stance_or_relevance: String(row.stance_or_relevance || row.summary || ""),
+    region_tags: String(row.region_tags || "").split(",").map((tag) => tag.trim()).filter(Boolean).length
+      ? String(row.region_tags || "").split(",").map((tag) => tag.trim()).filter(Boolean)
+      : [String(row.district || "기타")],
+    election_2026_status: String(row.election_2026_status || "공개 확인 자료 없음"),
+    source_name: String(row.source_name || "관리자 등록"),
     source_url: String(row.source_url || "#"),
-    official_website: null,
-    x_url: null,
-    blog_url: null,
-    office_phone: null,
+    official_website: row.official_website ? String(row.official_website) : null,
+    x_url: row.x_url ? String(row.x_url) : null,
+    blog_url: row.blog_url ? String(row.blog_url) : null,
+    office_phone: row.office_phone ? String(row.office_phone) : null,
     review_status: "approved",
     is_visible: true,
     updated_at: new Date().toISOString().slice(0, 10),

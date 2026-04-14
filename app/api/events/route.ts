@@ -12,11 +12,13 @@ export async function POST(req:Request){
   const user = await getCurrentUser();
   if (!user || (user.role !== "admin" && user.role !== "moderator" && user.role !== "manager")) return NextResponse.json({error:"Forbidden"},{status:403});
   const form = await req.formData();
-  db.prepare("INSERT INTO timeline_items (title, description, timeline_date, status, sort_order, image_url) VALUES (?, ?, ?, ?, ?, ?)").run(
+  db.prepare("INSERT INTO timeline_items (title, description, timeline_date, status, source_name, source_url, sort_order, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(
     String(form.get("title") || "").trim(),
     String(form.get("description") || "").trim(),
     String(form.get("timeline_date") || new Date().toISOString().slice(0,10)),
     String(form.get("status") || "진행"),
+    String(form.get("source_name") || "").trim() || null,
+    String(form.get("source_url") || "").trim() || null,
     Number(form.get("sort_order") || 0),
     String(form.get("image_url") || "").trim() || null,
   );

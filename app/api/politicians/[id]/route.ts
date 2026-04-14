@@ -12,14 +12,25 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   const form = await req.formData();
-  db.prepare("UPDATE politicians SET name=?, party=?, district=?, office_type=?, summary=?, image_url=?, source_url=? WHERE id=?").run(
+  db.prepare(`UPDATE politicians SET
+    name=?, party=?, district=?, office_type=?, region_tags=?, summary=?, stance_or_relevance=?, election_2026_status=?,
+    source_name=?, source_url=?, official_website=?, x_url=?, blog_url=?, office_phone=?, image_url=?
+    WHERE id=?`).run(
     String(form.get("name") || "").trim(),
     String(form.get("party") || "").trim(),
     String(form.get("district") || "").trim(),
     String(form.get("office_type") || "").trim(),
+    String(form.get("region_tags") || "").trim(),
     String(form.get("summary") || "").trim(),
-    String(form.get("image_url") || "").trim() || null,
+    String(form.get("stance_or_relevance") || "").trim(),
+    String(form.get("election_2026_status") || "").trim(),
+    String(form.get("source_name") || "").trim() || null,
     String(form.get("source_url") || "").trim() || null,
+    String(form.get("official_website") || "").trim() || null,
+    String(form.get("x_url") || "").trim() || null,
+    String(form.get("blog_url") || "").trim() || null,
+    String(form.get("office_phone") || "").trim() || null,
+    String(form.get("image_url") || "").trim() || null,
     id,
   );
   return redirectWithForwardedHeaders(req, "/politicians");

@@ -94,6 +94,7 @@ export function initDb() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       content TEXT NOT NULL,
+      is_pinned INTEGER NOT NULL DEFAULT 0,
       image_url TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
@@ -124,6 +125,8 @@ export function initDb() {
       image_url TEXT,
       timeline_date TEXT NOT NULL,
       status TEXT NOT NULL,
+      source_name TEXT,
+      source_url TEXT,
       sort_order INTEGER NOT NULL DEFAULT 0
     );
 
@@ -133,17 +136,28 @@ export function initDb() {
       party TEXT,
       district TEXT,
       office_type TEXT,
+      region_tags TEXT,
       summary TEXT,
-      image_url TEXT,
-      source_url TEXT
+      stance_or_relevance TEXT,
+      election_2026_status TEXT,
+      source_name TEXT,
+      source_url TEXT,
+      official_website TEXT,
+      x_url TEXT,
+      blog_url TEXT,
+      office_phone TEXT,
+      image_url TEXT
     );
 
     CREATE TABLE IF NOT EXISTS resources (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       url TEXT NOT NULL,
+      file_url TEXT,
+      description TEXT,
       category TEXT,
       thumbnail_url TEXT,
+      published_date TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -182,10 +196,24 @@ export function initDb() {
   addColumnIfMissing("posts", "view_count", "view_count INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing("posts", "image_urls", "image_urls TEXT");
   addColumnIfMissing("notices", "image_url", "image_url TEXT");
+  addColumnIfMissing("notices", "is_pinned", "is_pinned INTEGER NOT NULL DEFAULT 0");
   addColumnIfMissing("news_articles", "image_url", "image_url TEXT");
   addColumnIfMissing("timeline_items", "image_url", "image_url TEXT");
+  addColumnIfMissing("timeline_items", "source_name", "source_name TEXT");
+  addColumnIfMissing("timeline_items", "source_url", "source_url TEXT");
   addColumnIfMissing("politicians", "image_url", "image_url TEXT");
+  addColumnIfMissing("politicians", "region_tags", "region_tags TEXT");
+  addColumnIfMissing("politicians", "stance_or_relevance", "stance_or_relevance TEXT");
+  addColumnIfMissing("politicians", "election_2026_status", "election_2026_status TEXT");
+  addColumnIfMissing("politicians", "source_name", "source_name TEXT");
+  addColumnIfMissing("politicians", "official_website", "official_website TEXT");
+  addColumnIfMissing("politicians", "x_url", "x_url TEXT");
+  addColumnIfMissing("politicians", "blog_url", "blog_url TEXT");
+  addColumnIfMissing("politicians", "office_phone", "office_phone TEXT");
   addColumnIfMissing("resources", "thumbnail_url", "thumbnail_url TEXT");
+  addColumnIfMissing("resources", "description", "description TEXT");
+  addColumnIfMissing("resources", "file_url", "file_url TEXT");
+  addColumnIfMissing("resources", "published_date", "published_date TEXT");
   addColumnIfMissing("site_content", "route_map_image_url", "route_map_image_url TEXT");
 
   db.prepare(

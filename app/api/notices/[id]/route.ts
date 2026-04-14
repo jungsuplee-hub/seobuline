@@ -12,9 +12,10 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
   if (!(await checkAdmin())) return NextResponse.json({error:"Forbidden"},{status:403});
   const {id}=await params;
   const form = await req.formData();
-  db.prepare("UPDATE notices SET title = ?, content = ?, image_url = ? WHERE id = ?").run(
+  db.prepare("UPDATE notices SET title = ?, content = ?, is_pinned = ?, image_url = ? WHERE id = ?").run(
     String(form.get("title") || "").trim(),
     String(form.get("content") || "").trim(),
+    form.get("is_pinned") ? 1 : 0,
     String(form.get("image_url") || "").trim() || null,
     id,
   );

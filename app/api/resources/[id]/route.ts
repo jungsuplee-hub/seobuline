@@ -12,11 +12,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const form = await req.formData();
-  db.prepare("UPDATE resources SET title=?, url=?, category=?, thumbnail_url=? WHERE id=?").run(
+  const fileUrl = String(form.get("file_url") || "").trim();
+  db.prepare("UPDATE resources SET title=?, url=?, file_url=?, description=?, category=?, thumbnail_url=?, published_date=? WHERE id=?").run(
     String(form.get("title") || "").trim(),
-    String(form.get("url") || "").trim(),
+    fileUrl,
+    fileUrl,
+    String(form.get("description") || "").trim() || null,
     String(form.get("category") || "").trim(),
     String(form.get("thumbnail_url") || "").trim() || null,
+    String(form.get("published_date") || "").trim() || null,
     id,
   );
   return redirectWithForwardedHeaders(req, "/resources");

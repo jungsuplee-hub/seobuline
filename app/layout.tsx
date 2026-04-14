@@ -4,15 +4,14 @@ import "./globals.css";
 import { Footer, Header } from "@/components/layout";
 
 export const metadata: Metadata = {
-  title: "서부선 추진위원회",
+  title: "서부선 정상화 추진위원회 | 공개 출처 기반 주민 아카이브",
   description:
-    "서울 경전철 서부선(새절역~서울대입구역) 사업의 진행현황, 뉴스, 공개자료를 출처와 기준일과 함께 제공하는 주민 정보 아카이브",
+    "서부선 정상화 추진위원회가 운영하는 공개 출처 기반 정보 아카이브. 진행현황, 뉴스, 정치인 정보, 주민 참여 채널을 제공합니다.",
   openGraph: {
-    title: "서부선 추진위원회",
-    description:
-      "서부선 도시철도 사업의 추진 경과와 공개 발언·보도자료·공식문서를 출처 기반으로 정리한 아카이브",
+    title: "서부선 정상화 추진위원회",
+    description: "서부권 철도교통 핵심축 서부선의 추진현황과 시민 참여 정보를 공개 출처로 제공합니다.",
     url: process.env.NEXT_PUBLIC_SITE_URL,
-    siteName: "서부선 추진위원회",
+    siteName: "서부선 정상화 추진위원회",
   },
 };
 

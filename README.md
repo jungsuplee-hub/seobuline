@@ -82,6 +82,7 @@ npm run news:sync
 - 서대문구
 - 동작구
 - 관악구
+- 영등포구
 - 안양시
 - 기타지역
 
@@ -91,6 +92,13 @@ npm run news:sync
 - 홈 접속 시 `site_stats.home_view_count` 누적
 - 홈 화면에 가입 회원 수/홈페이지 조회수 카드 노출
 - 게시글 상세 진입 시 `posts.view_count` 증가
+
+## 비밀번호 초기화
+- 로그인 화면의 `비밀번호 초기화` 링크를 통해 `/forgot-password` 접근
+- 이메일 입력 시 `password_reset_tokens`에 토큰 생성(만료 30분)
+- 개발환경에서는 생성된 재설정 URL을 화면과 서버 로그에 표시
+- `/reset-password?token=...` 에서 새 비밀번호 저장 후 토큰 무효화
+- 비밀번호 변경 시 기존 세션 만료 처리
 
 ## Apache Reverse Proxy 권장
 - 예시 파일: `docs/apache-example.conf`

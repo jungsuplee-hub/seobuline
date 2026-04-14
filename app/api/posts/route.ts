@@ -27,7 +27,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+  if (!user) return redirectWithForwardedHeaders(req, `/login?next=${encodeURIComponent("/board/new")}`);
 
   const payload = Object.fromEntries((await req.formData()).entries());
   const parsed = postSchema.safeParse({

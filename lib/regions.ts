@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const REGIONS = ["은평구", "마포구", "서대문구", "동작구", "관악구", "안양시", "기타지역"] as const;
+export const REGIONS = ["은평구", "마포구", "서대문구", "동작구", "관악구", "영등포구", "안양시", "기타지역"] as const;
 
 export type Region = (typeof REGIONS)[number];
 

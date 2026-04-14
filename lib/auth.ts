@@ -26,7 +26,7 @@ async function isSecureRequest() {
   if (process.env.NODE_ENV !== "production") return false;
   const headerStore = await headers();
   const forwardedProto = headerStore.get("x-forwarded-proto");
-  return forwardedProto ? forwardedProto.includes("https") : true;
+  return forwardedProto ? forwardedProto.split(",").some((part) => part.trim() === "https") : true;
 }
 
 export async function hashPassword(password: string) {
@@ -62,14 +62,21 @@ export async function clearSession() {
   if (rawToken) {
     db.prepare("DELETE FROM sessions WHERE token = ?").run(hashToken(rawToken));
   }
-  cookieStore.set(SESSION_COOKIE, "", {
+  const deleteCookieOptions = {
     httpOnly: true,
-    secure,
     sameSite: "lax",
     path: "/",
     expires: new Date(0),
     maxAge: 0,
-  });
+  } as const;
+
+  cookieStore.set(SESSION_COOKIE, "", { ...deleteCookieOptions, secure });
+  cookieStore.set(SESSION_COOKIE, "", { ...deleteCookieOptions, secure: true });
+  cookieStore.set(SESSION_COOKIE, "", { ...deleteCookieOptions, secure: false });
+}
+
+export function generateResetToken() {
+  return randomBytes(32).toString("hex");
 }
 
 export async function getCurrentUser(): Promise<SessionUser | null> {

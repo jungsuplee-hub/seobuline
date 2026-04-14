@@ -1,0 +1,2 @@
+import Link from "next/link";import { Card } from "@/components/ui/card";import { notices } from "@/lib/mock-data";
+export default function NoticesPage(){return <div className="space-y-4"><h1 className="text-2xl font-bold">공지사항</h1>{notices.map(n=><Card key={n.id}><Link className="font-semibold hover:text-primary" href={`/notices/${n.id}`}>{n.is_pinned?"[고정] ":""}{n.title}</Link><p className="text-sm text-slate-500">{n.created_at}</p></Card>)}</div>;}

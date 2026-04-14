@@ -1,0 +1,2 @@
+import { Badge } from "@/components/ui/badge";import { Card } from "@/components/ui/card";import { timeline } from "@/lib/mock-data";
+export default function StatusPage(){return <div><h1 className="mb-4 text-2xl font-bold">진행현황</h1><div className="space-y-3">{timeline.map(i=><Card key={i.id}><div className="flex items-center justify-between"><h2 className="font-semibold">{i.title}</h2><Badge>{i.status}</Badge></div><p className="mt-1 text-sm">{i.description}</p><p className="mt-1 text-xs text-slate-500">{i.timeline_date}</p></Card>)}</div></div>;}

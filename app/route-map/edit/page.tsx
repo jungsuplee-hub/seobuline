@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 export default async function EditRouteMapPage() {
   const user = await getCurrentUser();
   if (!canManageContent(user)) redirect("/unauthorized");
+  db.prepare("INSERT INTO site_content (id, about_content, route_map_image_url) VALUES (1, '', NULL) ON CONFLICT(id) DO NOTHING").run();
   const row = db.prepare("SELECT route_map_image_url FROM site_content WHERE id = 1").get() as { route_map_image_url: string | null } | undefined;
 
   if (!row) {

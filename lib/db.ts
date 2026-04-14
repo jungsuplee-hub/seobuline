@@ -146,7 +146,8 @@ export function initDb() {
       x_url TEXT,
       blog_url TEXT,
       office_phone TEXT,
-      image_url TEXT
+      image_url TEXT,
+      is_visible INTEGER NOT NULL DEFAULT 1
     );
 
     CREATE TABLE IF NOT EXISTS resources (
@@ -210,6 +211,7 @@ export function initDb() {
   addColumnIfMissing("politicians", "x_url", "x_url TEXT");
   addColumnIfMissing("politicians", "blog_url", "blog_url TEXT");
   addColumnIfMissing("politicians", "office_phone", "office_phone TEXT");
+  addColumnIfMissing("politicians", "is_visible", "is_visible INTEGER NOT NULL DEFAULT 1");
   addColumnIfMissing("resources", "thumbnail_url", "thumbnail_url TEXT");
   addColumnIfMissing("resources", "description", "description TEXT");
   addColumnIfMissing("resources", "file_url", "file_url TEXT");

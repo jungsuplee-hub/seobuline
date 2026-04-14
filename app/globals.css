@@ -1,2 +1,22 @@
-@tailwind base;@tailwind components;@tailwind utilities;
-body{@apply bg-white text-slate-900}.container-width{@apply mx-auto w-full max-w-6xl px-4}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-[#070b11] text-[#f5efe5];
+  background-image: radial-gradient(circle at top right, rgba(208, 164, 83, 0.14), transparent 36%);
+}
+
+.container-width {
+  @apply mx-auto w-full max-w-6xl px-4;
+}
+
+input,
+textarea,
+select {
+  @apply rounded-md border border-[#d0a453]/35 bg-[#0f1621] p-2 text-sm text-[#f5efe5] placeholder:text-[#b6a992];
+}

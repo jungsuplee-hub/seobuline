@@ -40,7 +40,7 @@ export function getRouteMapImageUrl() {
 }
 
 export async function getTimelineItems() {
-  const rows = db.prepare("SELECT title, description, timeline_date, status, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
+  const rows = db.prepare("SELECT id, title, description, timeline_date, status, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
   if (!rows.length) {
     return readJsonFile<typeof timelineItems>("timeline.json", timelineItems);
   }
@@ -53,6 +53,7 @@ export async function getPoliticianItems() {
     return readJsonFile<typeof politicianItems>("politicians.json", politicianItems);
   }
   return rows.map((row) => ({
+    id: Number(row.id || 0),
     name: String(row.name || ""),
     party: String(row.party || ""),
     district: String(row.district || ""),

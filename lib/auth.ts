@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { isAdminEmail, normalizeEmail } from "@/lib/auth-config";
 import { db } from "@/lib/db";
 
-export type Role = "user" | "moderator" | "admin";
+export type Role = "user" | "manager" | "moderator" | "admin";
 
 export type SessionUser = {
   id: number;
@@ -123,7 +123,7 @@ export async function requireAuth(nextPath = "/mypage") {
 
 export async function requireAdmin(nextPath = "/") {
   const user = await requireAuth(nextPath);
-  if (user.role !== "admin" && user.role !== "moderator") {
+  if (user.role !== "admin") {
     redirect("/unauthorized");
   }
   return user;

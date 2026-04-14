@@ -14,7 +14,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     .get(id) as { id: number; title: string; content: string; region: string | null; category: string | null; image_urls: string | null; author_id: number } | undefined;
 
   if (!post) notFound();
-  if (post.author_id !== user.id) redirect(`/board/${id}`);
+  if (post.author_id !== user.id && user.role !== "admin" && user.role !== "moderator" && user.role !== "manager") redirect(`/board/${id}`);
 
   const imageUrls = post.image_urls ? (JSON.parse(post.image_urls) as string[]) : [];
 

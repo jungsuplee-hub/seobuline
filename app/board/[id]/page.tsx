@@ -38,7 +38,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
 
   if (!post) notFound();
 
-  const canManage = user?.id === post.author_id;
+  const canManage = user?.id === post.author_id || user?.role === "admin" || user?.role === "moderator" || user?.role === "manager";
   const imageUrls = post.image_urls ? (JSON.parse(post.image_urls) as string[]) : [];
 
   return (

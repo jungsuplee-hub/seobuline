@@ -10,7 +10,7 @@ export async function GET(){
 
 export async function POST(req:Request){
   const user = await getCurrentUser();
-  if (!user || (user.role !== "admin" && user.role !== "moderator")) return NextResponse.json({error:"Forbidden"},{status:403});
+  if (!user || (user.role !== "admin" && user.role !== "moderator" && user.role !== "manager")) return NextResponse.json({error:"Forbidden"},{status:403});
   const form = await req.formData();
   db.prepare("INSERT INTO timeline_items (title, description, timeline_date, status, sort_order, image_url) VALUES (?, ?, ?, ?, ?, ?)").run(
     String(form.get("title") || "").trim(),
@@ -20,5 +20,5 @@ export async function POST(req:Request){
     Number(form.get("sort_order") || 0),
     String(form.get("image_url") || "").trim() || null,
   );
-  return redirectWithForwardedHeaders(req, "/admin/timeline");
+  return redirectWithForwardedHeaders(req, "/status");
 }

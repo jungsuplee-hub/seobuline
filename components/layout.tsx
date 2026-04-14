@@ -42,7 +42,7 @@ export async function Header() {
               <Link href="/mypage" className="hover:text-[#f7d899]">
                 마이페이지
               </Link>
-              {(user.role === "admin" || user.role === "moderator") && (
+              {user.role === "admin" && (
                 <Link href="/admin" className="hover:text-[#f7d899]">
                   관리자
                 </Link>

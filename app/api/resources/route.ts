@@ -10,7 +10,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "admin" && user.role !== "moderator")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!user || (user.role !== "admin" && user.role !== "moderator" && user.role !== "manager")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const form = await req.formData();
   db.prepare("INSERT INTO resources (title, url, category, thumbnail_url) VALUES (?, ?, ?, ?)").run(
     String(form.get("title") || "").trim(),
@@ -18,5 +18,5 @@ export async function POST(req: Request) {
     String(form.get("category") || "").trim(),
     String(form.get("thumbnail_url") || "").trim() || null,
   );
-  return redirectWithForwardedHeaders(req, "/admin/resources");
+  return redirectWithForwardedHeaders(req, "/resources");
 }

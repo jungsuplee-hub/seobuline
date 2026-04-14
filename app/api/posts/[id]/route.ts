@@ -4,11 +4,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { parseImageUrls } from "@/lib/upload";
 
-function ownsPost(postId: string, userId: number) {
-  const post = db.prepare("SELECT author_id FROM posts WHERE id = ? AND is_deleted = 0").get(postId) as
-    | { author_id: number }
-    | undefined;
-  return Boolean(post && post.author_id === userId);
+function canManagePost(postId: string, user: { id: number; role: string }) {
+  if (user.role === "admin" || user.role === "moderator" || user.role === "manager") return true;
+  const post = db.prepare("SELECT author_id FROM posts WHERE id = ? AND is_deleted = 0").get(postId) as { author_id: number } | undefined;
+  return Boolean(post && post.author_id === user.id);
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -16,7 +15,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  if (!ownsPost(id, user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!canManagePost(id, user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const formData = await req.formData();
   const payload = Object.fromEntries(formData.entries());
@@ -39,7 +38,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  if (!ownsPost(id, user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!canManagePost(id, user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   db.prepare("UPDATE posts SET is_deleted = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(id);
   return redirectWithForwardedHeaders(req, "/board");

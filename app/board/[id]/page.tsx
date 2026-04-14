@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -8,9 +10,11 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   const user = await getCurrentUser();
   const { id } = await params;
 
+  db.prepare("UPDATE posts SET view_count = view_count + 1 WHERE id = ? AND is_deleted = 0").run(id);
+
   const post = db
     .prepare(
-      `SELECT p.id, p.title, p.content, p.region, p.category, p.created_at, p.author_id, u.nickname, u.email
+      `SELECT p.id, p.title, p.content, p.region, p.category, p.created_at, p.author_id, p.view_count, u.nickname, u.email
        FROM posts p
        JOIN users u ON u.id = p.author_id
        WHERE p.id = ? AND p.is_deleted = 0`,
@@ -24,6 +28,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
         category: string | null;
         created_at: string;
         author_id: number;
+        view_count: number;
         nickname: string | null;
         email: string;
       }
@@ -38,7 +43,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
       <p className="text-xs text-[#a89b84]">{post.category || "자유게시판"}</p>
       <h1 className="text-2xl font-bold">{post.title}</h1>
       <p className="text-xs text-[#a89b84]">
-        {new Date(post.created_at).toLocaleString("ko-KR")} · 작성자: {post.nickname || post.email.split("@")[0]} · 지역: {post.region || "미입력"}
+        {new Date(post.created_at).toLocaleString("ko-KR")} · 작성자: {post.nickname || post.email.split("@")[0]} · 지역: {post.region || "미입력"} · 조회수: {post.view_count}
       </p>
       <p className="whitespace-pre-wrap text-sm leading-7">{post.content}</p>
       <div className="flex gap-2 pt-2">

@@ -1,3 +1,4 @@
+import { redirectWithForwardedHeaders } from "@/lib/request";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -25,7 +26,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     id,
   );
 
-  return NextResponse.redirect(new URL("/board", req.url), { status: 303 });
+  return redirectWithForwardedHeaders(req, "/board");
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -36,7 +37,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   if (!ownsPost(id, user.id)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   db.prepare("UPDATE posts SET is_deleted = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(id);
-  return NextResponse.redirect(new URL("/board", req.url), { status: 303 });
+  return redirectWithForwardedHeaders(req, "/board");
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {

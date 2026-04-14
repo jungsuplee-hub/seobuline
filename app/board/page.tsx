@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +10,7 @@ export default async function BoardPage() {
   const user = await getCurrentUser();
   const items = db
     .prepare(
-      `SELECT p.id, p.title, p.content, p.region, p.category, p.created_at, u.nickname, u.email
+      `SELECT p.id, p.title, p.content, p.region, p.category, p.created_at, p.view_count, u.nickname, u.email
        FROM posts p
        JOIN users u ON u.id = p.author_id
        WHERE p.is_deleted = 0
@@ -24,6 +26,7 @@ export default async function BoardPage() {
     created_at: string;
     nickname: string | null;
     email: string;
+    view_count: number;
   }>;
 
   return (
@@ -46,7 +49,7 @@ export default async function BoardPage() {
           </div>
           <p className="mt-2 line-clamp-2 text-sm text-[#ddd0b8]">{post.content}</p>
           <p className="mt-2 text-xs text-[#a89b84]">
-            작성자: {post.nickname || post.email.split("@")[0]} · 지역: {post.region || "미입력"}
+            작성자: {post.nickname || post.email.split("@")[0]} · 지역: {post.region || "미입력"} · 조회수: {post.view_count}
           </p>
         </Card>
       ))}

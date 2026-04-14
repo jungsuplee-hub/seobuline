@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { createSession, hashPassword, validateEmail } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { regionSchema } from "@/lib/regions";
 
 export async function POST(req: Request) {
   const payload = await req.json();
   const email = String(payload.email || "").trim().toLowerCase();
   const password = String(payload.password || "");
-  const region = String(payload.region || "").trim();
+  const regionRaw = String(payload.region || "").trim();
+  const regionResult = regionSchema.safeParse(regionRaw);
   const nicknameRaw = String(payload.nickname || "").trim();
   const nickname = nicknameRaw.length ? nicknameRaw : null;
 
@@ -16,8 +18,8 @@ export async function POST(req: Request) {
   if (password.length < 8) {
     return NextResponse.json({ error: "비밀번호는 8자 이상이어야 합니다." }, { status: 400 });
   }
-  if (!region) {
-    return NextResponse.json({ error: "지역을 입력해 주세요." }, { status: 400 });
+  if (!regionResult.success) {
+    return NextResponse.json({ error: "지역을 올바르게 선택해 주세요." }, { status: 400 });
   }
 
   const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email) as { id: number } | undefined;
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
   const passwordHash = await hashPassword(password);
   const result = db
     .prepare("INSERT INTO users (email, password_hash, nickname, region) VALUES (?, ?, ?, ?)")
-    .run(email, passwordHash, nickname, region);
+    .run(email, passwordHash, nickname, regionResult.data);
 
   await createSession(Number(result.lastInsertRowid));
 

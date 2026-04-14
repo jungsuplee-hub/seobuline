@@ -13,6 +13,13 @@ db.pragma("foreign_keys = ON");
 
 let initialized = false;
 
+function addColumnIfMissing(table: string, column: string, ddl: string) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  if (!columns.some((item) => item.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
+}
+
 export function initDb() {
   if (initialized) return;
 
@@ -43,6 +50,7 @@ export function initDb() {
       content TEXT NOT NULL,
       author_id INTEGER NOT NULL,
       region TEXT,
+      view_count INTEGER NOT NULL DEFAULT 0,
       is_deleted INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -111,10 +119,23 @@ export function initDb() {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS site_stats (
+      key TEXT PRIMARY KEY,
+      value INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
     CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
   `);
+
+  addColumnIfMissing("posts", "view_count", "view_count INTEGER NOT NULL DEFAULT 0");
+  db.prepare(
+    `INSERT INTO site_stats (key, value, updated_at)
+     VALUES ('home_view_count', 0, CURRENT_TIMESTAMP)
+     ON CONFLICT(key) DO NOTHING`,
+  ).run();
 
   initialized = true;
 }

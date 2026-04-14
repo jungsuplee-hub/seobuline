@@ -74,3 +74,29 @@ npm run news:sync
 ## 참고
 - 로컬 DB 파일: `data/seobuline.db`
 - 세션 쿠키 이름: `seobuline_session`
+
+## 지역 입력 정책
+회원가입/프로필 수정의 지역은 아래 값만 허용됩니다.
+- 은평구
+- 마포구
+- 서대문구
+- 동작구
+- 관악구
+- 안양시
+- 기타지역
+
+클라이언트 select와 서버 검증이 동일한 상수(`lib/regions.ts`)를 사용합니다.
+
+## 조회수/회원수 집계
+- 홈 접속 시 `site_stats.home_view_count` 누적
+- 홈 화면에 가입 회원 수/홈페이지 조회수 카드 노출
+- 게시글 상세 진입 시 `posts.view_count` 증가
+
+## Apache Reverse Proxy 권장
+- 예시 파일: `docs/apache-example.conf`
+- 필수 권장 헤더
+  - `ProxyPreserveHost On`
+  - `RequestHeader set X-Forwarded-Proto "https"`
+  - `RequestHeader set X-Forwarded-Port "443"`
+  - `RequestHeader set X-Forwarded-Host "%{HTTP_HOST}s"`
+- 참고: HTTPS 종단이 Apache인 경우, 앱은 전달받은 `X-Forwarded-Proto`로 secure cookie/redirect origin을 판단합니다.

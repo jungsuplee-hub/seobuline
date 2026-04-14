@@ -4,9 +4,20 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { politicianItems as fallbackItems } from "@/lib/public-data";
 
-type PoliticianItem = (typeof fallbackItems)[number] & { id?: number; image_url?: string | null };
+type PoliticianItem = {
+  id?: number;
+  name: string;
+  party: string;
+  district: string;
+  office_type: string;
+  region_tags?: string[];
+  summary: string;
+  stance_or_relevance?: string;
+  office_phone?: string | null;
+  is_visible?: boolean;
+  image_url?: string | null;
+};
 
 export default function PoliticiansClient({ items, canManage }: { items: PoliticianItem[]; canManage: boolean }) {
   const searchParams = useSearchParams();
@@ -42,6 +53,7 @@ export default function PoliticiansClient({ items, canManage }: { items: Politic
           <h2 className="font-semibold">{item.name} · {item.office_type}</h2>
           <p className="text-sm">{item.party} / {item.district}</p>
           {item.image_url && <img src={item.image_url} alt="정치인 이미지" className="mt-2 h-40 w-full rounded object-cover" />}
+          <p className="mt-2 text-sm text-[#dfcfb5]">대표 전화: {item.office_phone?.trim() ? item.office_phone : "정보 없음"}</p>
           <p className="mt-2 text-sm">{item.summary}</p>
           {canManage && item.id ? <div className="mt-2 flex gap-2"><Link href={`/politicians/${item.id}/edit`} className="rounded border px-2 py-1 text-xs">수정</Link><form action={`/api/politicians/${item.id}`} method="post"><input type="hidden" name="_method" value="DELETE" /><button className="rounded border border-red-400/60 px-2 py-1 text-xs text-red-300">삭제</button></form></div> : null}
         </Card>

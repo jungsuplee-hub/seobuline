@@ -32,7 +32,7 @@ export default async function RouteMapPage() {
               alt="서부선 예상노선도"
               width={2400}
               height={1600}
-              className="h-auto w-full object-contain"
+              className="mx-auto max-h-[70vh] h-auto w-auto max-w-full object-contain"
               priority
             />
           </a>

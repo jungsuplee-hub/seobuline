@@ -10,6 +10,18 @@ export interface SiteContent {
   faqItems: typeof faqItems;
 }
 
+export interface TimelineItem {
+  id?: number;
+  title: string;
+  description: string;
+  timeline_date: string;
+  status: string;
+  source_name?: string | null;
+  source_url?: string | null;
+  sort_order: number;
+  image_url?: string | null;
+}
+
 async function readJsonFile<T>(fileName: string, fallback: T): Promise<T> {
   try {
     const raw = await fs.readFile(path.join(DATA_DIR, fileName), "utf8");
@@ -22,14 +34,17 @@ async function readJsonFile<T>(fileName: string, fallback: T): Promise<T> {
 export async function getSiteContent(): Promise<SiteContent> {
   const base = await readJsonFile<SiteContent>("site-content.json", { projectOverview, faqItems });
   const row = db.prepare("SELECT about_content, image_url FROM site_content WHERE id = 1").get() as { about_content: string | null; image_url: string | null } | undefined;
-  if (!row?.about_content) return base;
+  if (!row) return base;
+
+  const mergedAboutContent = row.about_content?.trim() ? row.about_content : base.projectOverview.business_summary;
+  const mergedHeroImageUrl = row.image_url?.trim() ? row.image_url : ((base.projectOverview as { hero_image_url?: string | null }).hero_image_url ?? null);
 
   return {
     ...base,
     projectOverview: {
       ...base.projectOverview,
-      business_summary: row.about_content,
-      hero_image_url: row.image_url ?? null,
+      business_summary: mergedAboutContent,
+      hero_image_url: mergedHeroImageUrl,
     },
   } as SiteContent;
 }
@@ -39,12 +54,53 @@ export function getRouteMapImageUrl() {
   return row?.route_map_image_url ?? null;
 }
 
-export async function getTimelineItems() {
+export async function getTimelineItems(): Promise<TimelineItem[]> {
   const rows = db.prepare("SELECT id, title, description, timeline_date, status, source_name, source_url, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
   if (!rows.length) {
-    return readJsonFile<typeof timelineItems>("timeline.json", timelineItems);
+    const fallback = await readJsonFile<typeof timelineItems>("timeline.json", timelineItems);
+    if (fallback.length) {
+      const insert = db.prepare("INSERT INTO timeline_items (title, description, timeline_date, status, source_name, source_url, sort_order, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+      const syncFallback = db.transaction((items: typeof fallback) => {
+        for (const item of items) {
+          insert.run(
+            String(item.title || "").trim(),
+            String(item.description || "").trim(),
+            String(item.timeline_date || "").trim(),
+            String(item.status || "진행").trim(),
+            String(item.source_name || "관리자 등록").trim() || null,
+            String(item.source_url || "").trim() || null,
+            Number(item.sort_order || 0),
+            "image_url" in item && item.image_url ? String(item.image_url).trim() : null,
+          );
+        }
+      });
+      syncFallback(fallback);
+      const seededRows = db.prepare("SELECT id, title, description, timeline_date, status, source_name, source_url, sort_order, image_url FROM timeline_items ORDER BY sort_order ASC, timeline_date DESC").all() as Array<Record<string, unknown>>;
+      return seededRows.map((row) => ({
+        id: Number(row.id || 0),
+        title: String(row.title || ""),
+        description: String(row.description || ""),
+        timeline_date: String(row.timeline_date || ""),
+        status: String(row.status || ""),
+        source_name: row.source_name ? String(row.source_name) : null,
+        source_url: row.source_url ? String(row.source_url) : null,
+        sort_order: Number(row.sort_order || 0),
+        image_url: row.image_url ? String(row.image_url) : null,
+      }));
+    }
+    return fallback.map((item) => ({ ...item, id: undefined, image_url: null }));
   }
-  return rows;
+  return rows.map((row) => ({
+    id: Number(row.id || 0),
+    title: String(row.title || ""),
+    description: String(row.description || ""),
+    timeline_date: String(row.timeline_date || ""),
+    status: String(row.status || ""),
+    source_name: row.source_name ? String(row.source_name) : null,
+    source_url: row.source_url ? String(row.source_url) : null,
+    sort_order: Number(row.sort_order || 0),
+    image_url: row.image_url ? String(row.image_url) : null,
+  }));
 }
 
 export async function getPoliticianItems() {

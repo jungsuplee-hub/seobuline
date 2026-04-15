@@ -13,7 +13,7 @@ export default async function NewResourcePage() {
       <form action="/api/resources" method="post" className="space-y-2">
         <input name="title" required className="w-full" placeholder="제목" />
         <textarea name="description" className="min-h-24 w-full" placeholder="설명" />
-        <input name="file_url" type="url" className="w-full" placeholder="링크 URL (선택)" />
+        <input name="file_url" type="text" className="w-full" placeholder="외부 링크 URL (선택, https://...)" />
         <input name="category" className="w-full" placeholder="카테고리" />
         <input type="date" name="published_date" className="w-full" defaultValue={new Date().toISOString().slice(0, 10)} />
         <AdminImageInput

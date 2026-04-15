@@ -23,38 +23,43 @@ export async function Header() {
 
   return (
     <header className="border-b border-[#d0a453]/20 bg-[#0a0f16]/95 text-[#f5efe5] backdrop-blur">
-      <div className="container-width flex flex-wrap items-center justify-between gap-4 py-4">
-        <Link href="/" className="text-lg font-bold tracking-tight text-[#f7d899]">
-          서부선 정상화 추진위원회
-        </Link>
-        <nav className="flex flex-wrap gap-3 text-sm text-[#eadcc3]">
+      <div className="container-width py-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <Link href="/" className="text-lg font-bold tracking-tight text-[#f7d899]">
+            서부선 정상화 추진위원회
+          </Link>
+          <div className="flex flex-wrap items-center justify-end gap-3 text-sm">
+            <a
+              href={KAKAO_OPEN_CHAT}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded border border-[#d0a453]/60 px-2 py-1 text-[#f7d899]"
+            >
+              <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
+                K
+              </span>
+              카카오톡 채팅방 참여하기 ↗
+            </a>
+            <a
+              href={NAVER_CAFE}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded border border-[#03C75A]/60 px-2 py-1 text-[#03C75A]"
+            >
+              <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
+                N
+              </span>
+              네이버 카페 바로가기 ↗
+            </a>
+          </div>
+        </div>
+        <nav className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[#eadcc3]">
           {nav.map(([label, href]) => (
             <Link key={href} href={href} className="hover:text-[#f7d899]">
               {label}
             </Link>
           ))}
-          <a
-            href={KAKAO_OPEN_CHAT}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded border border-[#d0a453]/60 px-2 py-1 text-[#f7d899]"
-          >
-            <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
-              K
-            </span>
-            카카오톡 채팅방 참여하기 ↗
-          </a>
-          <a
-            href={NAVER_CAFE}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded border border-[#03C75A]/60 px-2 py-1 text-[#03C75A]"
-          >
-            <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
-              N
-            </span>
-            네이버 카페 바로가기 ↗
-          </a>
+          <span className="hidden md:inline text-[#d0a453]/40">|</span>
           {user ? (
             <>
               <Link href="/mypage" className="hover:text-[#f7d899]">

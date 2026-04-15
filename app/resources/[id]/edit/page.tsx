@@ -19,7 +19,7 @@ export default async function EditResourcePage({ params }: { params: Promise<{ i
         <input type="hidden" name="_method" value="PATCH" />
         <input name="title" defaultValue={r.title} className="w-full" required />
         <textarea name="description" defaultValue={r.description || ""} className="min-h-24 w-full" />
-        <input name="file_url" type="url" defaultValue={r.file_url || r.url} className="w-full" placeholder="링크 URL (선택)" />
+        <input name="file_url" type="text" defaultValue={r.file_url || r.url} className="w-full" placeholder="외부 링크 URL (선택, https://...)" />
         <input name="category" defaultValue={r.category || ""} className="w-full" />
         <input type="date" name="published_date" defaultValue={r.published_date || ""} className="w-full" />
         <AdminImageInput

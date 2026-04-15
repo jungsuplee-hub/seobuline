@@ -12,7 +12,7 @@ const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
 const NAVER_CAFE = "https://cafe.naver.com/seobuline1";
 
 const iconClassName =
-  "inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold leading-none text-[#0a0f16]";
+  "inline-flex h-5 w-5 items-center justify-center rounded-md text-[11px] font-bold leading-none";
 
 export async function HeroSection() {
   const { homeHero } = await getSiteContent();
@@ -49,14 +49,14 @@ export async function HeroSection() {
           </Button>
           <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer">
             <Button variant="ghost" className="inline-flex items-center gap-2">
-              <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
+              <span className={iconClassName} style={{ backgroundColor: "#FEE500", color: "#0a0f16" }} aria-hidden>
                 K
               </span>
               카카오톡 채팅방 참여 ↗
             </Button>
           </a>
           <a href={NAVER_CAFE} target="_blank" rel="noreferrer">
-            <Button variant="ghost" className="inline-flex items-center gap-2 text-[#03C75A]">
+            <Button variant="ghost" className="inline-flex items-center gap-2">
               <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
                 N
               </span>
@@ -209,14 +209,14 @@ export function CampaignBanner() {
         <Button href="/route-map" variant="outline">서부선 예상노선도 보기</Button>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer">
           <Button className="inline-flex items-center gap-2">
-            <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
+            <span className={iconClassName} style={{ backgroundColor: "#FEE500", color: "#0a0f16" }} aria-hidden>
               K
             </span>
             오픈채팅방 바로가기 ↗
           </Button>
         </a>
         <a href={NAVER_CAFE} target="_blank" rel="noreferrer">
-          <Button variant="outline" className="inline-flex items-center gap-2 text-[#03C75A]">
+          <Button variant="outline" className="inline-flex items-center gap-2">
             <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
               N
             </span>

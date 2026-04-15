@@ -59,17 +59,6 @@ export async function Header() {
               {label}
             </Link>
           ))}
-          <a
-            href={KAKAO_OPEN_CHAT}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded border border-[#d0a453]/60 px-2 py-1 text-[#f7d899]"
-          >
-            <span className={iconClassName} style={{ backgroundColor: "#FEE500", color: "#0a0f16" }} aria-hidden>
-              K
-            </span>
-            카카오톡 채팅방 참여하기 ↗
-          </a>
           {user ? (
             <>
               <Link href="/mypage" className="hover:text-[#f7d899]">

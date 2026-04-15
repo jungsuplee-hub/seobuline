@@ -208,7 +208,7 @@ export function CampaignBanner() {
       <div className="mt-4 flex flex-wrap gap-3">
         <Button href="/route-map" variant="outline">서부선 예상노선도 보기</Button>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer">
-          <Button className="inline-flex items-center gap-2">
+          <Button variant="outline" className="inline-flex items-center gap-2">
             <span className={iconClassName} style={{ backgroundColor: "#FEE500", color: "#0a0f16" }} aria-hidden>
               K
             </span>

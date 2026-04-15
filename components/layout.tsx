@@ -16,7 +16,7 @@ const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
 const NAVER_CAFE = "https://cafe.naver.com/seobuline1";
 
 const iconClassName =
-  "inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold leading-none text-[#0a0f16]";
+  "inline-flex h-5 w-5 items-center justify-center rounded-md text-[11px] font-bold leading-none";
 
 export async function Header() {
   const user = await getCurrentUser();
@@ -59,7 +59,17 @@ export async function Header() {
               {label}
             </Link>
           ))}
-          <span className="hidden md:inline text-[#d0a453]/40">|</span>
+          <a
+            href={KAKAO_OPEN_CHAT}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded border border-[#d0a453]/60 px-2 py-1 text-[#f7d899]"
+          >
+            <span className={iconClassName} style={{ backgroundColor: "#FEE500", color: "#0a0f16" }} aria-hidden>
+              K
+            </span>
+            카카오톡 채팅방 참여하기 ↗
+          </a>
           {user ? (
             <>
               <Link href="/mypage" className="hover:text-[#f7d899]">
@@ -101,12 +111,12 @@ export function Footer() {
           예상노선도 보기
         </Link>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer" className="mr-4 inline-flex items-center gap-2 underline">
-          <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
+          <span className={iconClassName} style={{ backgroundColor: "#FEE500", color: "#0a0f16" }} aria-hidden>
             K
           </span>
           오픈채팅방 바로가기 ↗
         </a>
-        <a href={NAVER_CAFE} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 underline text-[#03C75A]">
+        <a href={NAVER_CAFE} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 underline">
           <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
             N
           </span>

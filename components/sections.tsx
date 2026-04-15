@@ -11,6 +11,9 @@ import { db } from "@/lib/db";
 const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
 const NAVER_CAFE = "https://cafe.naver.com/seobuline1";
 
+const iconClassName =
+  "inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold leading-none text-[#0a0f16]";
+
 export async function HeroSection() {
   const { homeHero } = await getSiteContent();
   const heroTitleLines = homeHero.title.split("\n").filter(Boolean);
@@ -45,10 +48,20 @@ export async function HeroSection() {
             게시판 보기
           </Button>
           <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer">
-            <Button variant="ghost">카카오톡 채팅방 참여 ↗</Button>
+            <Button variant="ghost" className="inline-flex items-center gap-2">
+              <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
+                K
+              </span>
+              카카오톡 채팅방 참여 ↗
+            </Button>
           </a>
           <a href={NAVER_CAFE} target="_blank" rel="noreferrer">
-            <Button variant="ghost">네이버 카페 바로가기 ↗</Button>
+            <Button variant="ghost" className="inline-flex items-center gap-2 text-[#03C75A]">
+              <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
+                N
+              </span>
+              네이버 카페 바로가기 ↗
+            </Button>
           </a>
         </div>
       </div>
@@ -194,8 +207,22 @@ export function CampaignBanner() {
       <p className="mt-2 text-sm text-[#e7d9c1]">최신 예상노선도는 전용 페이지에서 확인하고, 소식 공유는 카카오톡 오픈채팅과 네이버 카페에서 이어가실 수 있습니다.</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <Button href="/route-map" variant="outline">서부선 예상노선도 보기</Button>
-        <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer"><Button>오픈채팅방 바로가기 ↗</Button></a>
-        <a href={NAVER_CAFE} target="_blank" rel="noreferrer"><Button variant="outline">네이버 카페 바로가기 ↗</Button></a>
+        <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer">
+          <Button className="inline-flex items-center gap-2">
+            <span className={iconClassName} style={{ backgroundColor: "#FEE500" }} aria-hidden>
+              K
+            </span>
+            오픈채팅방 바로가기 ↗
+          </Button>
+        </a>
+        <a href={NAVER_CAFE} target="_blank" rel="noreferrer">
+          <Button variant="outline" className="inline-flex items-center gap-2 text-[#03C75A]">
+            <span className={iconClassName} style={{ backgroundColor: "#03C75A", color: "#ffffff" }} aria-hidden>
+              N
+            </span>
+            네이버 카페 바로가기 ↗
+          </Button>
+        </a>
       </div>
     </Card>
   );

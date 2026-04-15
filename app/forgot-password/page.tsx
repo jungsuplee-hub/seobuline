@@ -10,27 +10,37 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resetLink, setResetLink] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     setError(null);
     setMessage(null);
     setResetLink(null);
 
-    const res = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(data.error || "초기화 요청에 실패했습니다.");
-      return;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "초기화 요청에 실패했습니다.");
+        return;
+      }
+
+      setMessage(data.message || "비밀번호 초기화 링크가 생성되었습니다.");
+      setResetLink(data.resetLink || null);
+    } catch {
+      setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setMessage(data.message || "비밀번호 초기화 링크가 생성되었습니다.");
-    setResetLink(data.resetLink || null);
   };
 
   return (
@@ -46,7 +56,9 @@ export default function ForgotPasswordPage() {
             재설정 링크: <a className="underline" href={resetLink}>{resetLink}</a>
           </p>
         )}
-        <Button type="submit" className="w-full">초기화 링크 생성</Button>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "생성 중..." : "초기화 링크 생성"}
+        </Button>
       </form>
     </Card>
   );

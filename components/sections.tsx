@@ -9,6 +9,7 @@ import { notices } from "@/lib/public-data";
 import { db } from "@/lib/db";
 
 const KAKAO_OPEN_CHAT = "https://open.kakao.com/o/g9w5KIpi";
+const NAVER_CAFE = "https://cafe.naver.com/seobuline1";
 
 export async function HeroSection() {
   const { homeHero } = await getSiteContent();
@@ -45,6 +46,9 @@ export async function HeroSection() {
           </Button>
           <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer">
             <Button variant="ghost">카카오톡 채팅방 참여 ↗</Button>
+          </a>
+          <a href={NAVER_CAFE} target="_blank" rel="noreferrer">
+            <Button variant="ghost">네이버 카페 바로가기 ↗</Button>
           </a>
         </div>
       </div>
@@ -164,7 +168,11 @@ export async function HomeLists() {
         </ul>
       </Card>
       <Card>
-        <h2 className="font-semibold">정치인 정보 바로가기</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-semibold">정치인 정보 바로가기</h2>
+          <Link href="/politicians" className="text-xs font-medium text-[#f7d899] hover:underline">전체 보기 →</Link>
+        </div>
+        <p className="mt-2 text-xs text-[#decfb8]">요청 반영 내용은 정치인 정보 페이지에서 바로 확인할 수 있습니다.</p>
         <ul className="mt-3 space-y-2 text-sm">
           {politicianItems.slice(0, 6).map((item) => (
             <li key={`${item.name}-${item.office_type}`}>
@@ -183,10 +191,11 @@ export function CampaignBanner() {
   return (
     <Card className="border-[#d0a453]/40 bg-[linear-gradient(135deg,rgba(208,164,83,0.2),rgba(14,20,30,0.95))]">
       <p className="text-xl font-semibold">서부선 예상노선도와 소통 채널을 확인해 주세요.</p>
-      <p className="mt-2 text-sm text-[#e7d9c1]">최신 예상노선도는 전용 페이지에서 확인하고, 소식 공유는 오픈채팅방에서 이어가실 수 있습니다.</p>
+      <p className="mt-2 text-sm text-[#e7d9c1]">최신 예상노선도는 전용 페이지에서 확인하고, 소식 공유는 카카오톡 오픈채팅과 네이버 카페에서 이어가실 수 있습니다.</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <Button href="/route-map" variant="outline">서부선 예상노선도 보기</Button>
         <a href={KAKAO_OPEN_CHAT} target="_blank" rel="noreferrer"><Button>오픈채팅방 바로가기 ↗</Button></a>
+        <a href={NAVER_CAFE} target="_blank" rel="noreferrer"><Button variant="outline">네이버 카페 바로가기 ↗</Button></a>
       </div>
     </Card>
   );

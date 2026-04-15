@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const resetStatus = searchParams.get("reset");
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +40,9 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold">로그인</h1>
       <p className="mt-1 text-sm text-[#dccdaf]">이메일/비밀번호로 로그인 후 게시글을 작성할 수 있습니다.</p>
       <form className="mt-4 space-y-3" onSubmit={onSubmit}>
+        {resetStatus === "success" && (
+          <p className="text-sm text-emerald-300">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.</p>
+        )}
         <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호" required minLength={8} />
         {error && <p className="text-sm text-red-300">{error}</p>}

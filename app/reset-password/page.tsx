@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,12 @@ export default function ResetPasswordPage() {
   const params = useSearchParams();
   const router = useRouter();
   const token = params.get("token") || "";
+
+  useEffect(() => {
+    if (!token) {
+      setError("유효한 토큰이 없습니다. 비밀번호 초기화를 다시 요청해 주세요.");
+    }
+  }, [token]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,23 +39,27 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ token, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(data.error || "비밀번호 재설정에 실패했습니다.");
-      return;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "비밀번호 재설정에 실패했습니다.");
+        return;
+      }
+
+      setMessage(data.message || "비밀번호가 재설정되었습니다.");
+      setTimeout(() => {
+        router.push("/login?reset=success");
+        router.refresh();
+      }, 1200);
+    } catch {
+      setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     }
-
-    setMessage(data.message || "비밀번호가 재설정되었습니다.");
-    setTimeout(() => {
-      router.push("/login");
-      router.refresh();
-    }, 1200);
   };
 
   return (
@@ -60,7 +70,9 @@ export default function ResetPasswordPage() {
         <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="새 비밀번호 확인" required minLength={8} />
         {error && <p className="text-sm text-red-300">{error}</p>}
         {message && <p className="text-sm text-emerald-300">{message}</p>}
-        <Button type="submit" className="w-full">비밀번호 변경</Button>
+        <Button type="submit" className="w-full" disabled={!token}>
+          비밀번호 변경
+        </Button>
       </form>
     </Card>
   );

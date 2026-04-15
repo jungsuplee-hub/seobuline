@@ -39,7 +39,14 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   if (!post) notFound();
 
   const canManage = user?.id === post.author_id || user?.role === "admin" || user?.role === "moderator" || user?.role === "manager";
-  const imageUrls = post.image_urls ? (JSON.parse(post.image_urls) as string[]) : [];
+  const uploadedUrls = post.image_urls ? (JSON.parse(post.image_urls) as string[]) : [];
+  const isImageUrl = (url: string) => /\.(jpe?g|png|gif|webp|svg)(\?.*)?$/i.test(url);
+  const imageUrls = uploadedUrls.filter((url) => isImageUrl(url));
+  const attachmentUrls = uploadedUrls.filter((url) => !isImageUrl(url));
+  const fileNameFromUrl = (url: string) => {
+    const clean = url.split("?")[0] || url;
+    return clean.split("/").pop() || "첨부파일";
+  };
 
   return (
     <Card className="space-y-3">
@@ -53,6 +60,20 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           {imageUrls.map((url) => (
             <img key={url} src={url} alt="첨부 이미지" className="h-32 w-full rounded-md object-cover" />
           ))}
+        </div>
+      )}
+      {!!attachmentUrls.length && (
+        <div className="rounded-md border border-[#d0a453]/35 p-3">
+          <p className="mb-2 text-xs font-semibold text-[#f7d899]">첨부파일</p>
+          <ul className="space-y-1">
+            {attachmentUrls.map((url) => (
+              <li key={url}>
+                <a href={url} target="_blank" rel="noreferrer" className="text-sm text-[#d9cbad] underline decoration-[#d0a453]/50 hover:text-[#f7d899]">
+                  {fileNameFromUrl(url)}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       <RenderRichContent content={post.content} />

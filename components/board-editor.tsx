@@ -71,6 +71,16 @@ export default function BoardEditor({ mode, action, submitLabel, defaultValue }:
     }
   }
 
+  function isImageUrl(url: string) {
+    return /\.(jpe?g|png|gif|webp|svg)(\?.*)?$/i.test(url);
+  }
+
+  function fileNameFromUrl(url: string) {
+    const clean = url.split("?")[0] || url;
+    const name = clean.split("/").pop();
+    return name || "첨부파일";
+  }
+
   return (
     <form action={action} method="post" className="mt-4 space-y-3">
       {mode === "edit" && <input type="hidden" name="_method" value="PATCH" />}
@@ -92,14 +102,30 @@ export default function BoardEditor({ mode, action, submitLabel, defaultValue }:
         onPaste={handlePaste}
       />
       <div className="space-y-2 rounded-md border border-[#d0a453]/40 p-3">
-        <p className="text-xs text-[#d9cbad]">이미지 첨부(여러 장 가능, jpg/png/webp/gif, 10MB 이하)</p>
-        <input type="file" accept="image/*" multiple onChange={(e) => handleFileInput(e.target.files)} />
-        {uploading && <p className="text-xs text-[#f7d899]">이미지 업로드 중...</p>}
+        <p className="text-xs text-[#d9cbad]">첨부파일(여러 개 가능, 이미지/PDF/문서/압축, 10MB 이하)</p>
+        <input
+          type="file"
+          accept="image/*,.pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.json"
+          multiple
+          onChange={(e) => handleFileInput(e.target.files)}
+        />
+        {uploading && <p className="text-xs text-[#f7d899]">파일 업로드 중...</p>}
         {error && <p className="text-xs text-red-300">{error}</p>}
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           {imageUrls.map((url) => (
             <div key={url} className="relative">
-              <img src={url} alt="첨부 이미지" className="h-20 w-full rounded object-cover" />
+              {isImageUrl(url) ? (
+                <img src={url} alt="첨부 이미지" className="h-20 w-full rounded object-cover" />
+              ) : (
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex h-20 w-full items-center justify-center rounded border border-[#d0a453]/40 px-2 text-center text-xs text-[#f7d899] hover:bg-[#d0a453]/10"
+                >
+                  {fileNameFromUrl(url)}
+                </a>
+              )}
               <button
                 type="button"
                 className="absolute right-1 top-1 rounded bg-black/60 px-1 text-xs"

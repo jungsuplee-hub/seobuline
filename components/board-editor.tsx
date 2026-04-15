@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function BoardEditor({ mode, action, submitLabel, defaultValue }: Props) {
-  const [content, setContent] = useState(defaultValue?.content || "");
+  const [content, setContent] = useState(() => (defaultValue?.content || "").replace(/^!\[[^\]]*\]\(\/uploads\/[^)\s]+\)\s*$/gm, "").trim());
   const [imageUrls, setImageUrls] = useState<string[]>(defaultValue?.imageUrls || []);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,6 @@ export default function BoardEditor({ mode, action, submitLabel, defaultValue }:
         urls.push(await upload(file));
       }
       setImageUrls((prev) => [...prev, ...urls]);
-      setContent((prev) => `${prev}${prev ? "\n" : ""}${urls.map((url) => `![](${url})`).join("\n")}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "업로드 실패");
     } finally {
@@ -64,9 +63,7 @@ export default function BoardEditor({ mode, action, submitLabel, defaultValue }:
       for (const image of images) {
         urls.push(await upload(image));
       }
-      const markdown = urls.map((url) => `![](${url})`).join("\n");
       setImageUrls((prev) => [...prev, ...urls]);
-      setContent((prev) => `${prev}${prev ? "\n" : ""}${markdown}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "붙여넣기 업로드 실패");
     } finally {

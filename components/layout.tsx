@@ -6,7 +6,7 @@ const nav = [
   ["진행현황", "/status"],
   ["뉴스", "/news"],
   ["공지", "/notices"],
-  ["게시판", "/board"],
+  ["자유게시판", "/board"],
   ["예상노선도", "/route-map"],
   ["정치인정보", "/politicians"],
   ["자료실", "/resources"],

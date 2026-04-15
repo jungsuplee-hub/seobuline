@@ -34,7 +34,7 @@ export default async function BoardPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">게시판</h1>
+          <h1 className="text-2xl font-bold">자유게시판</h1>
           <p className="text-sm text-[#d8caaf]">비회원은 열람만, 회원은 글쓰기/본인 글 수정 가능</p>
         </div>
         {user ? <Button href="/board/new">글쓰기</Button> : <Button href="/login?next=/board/new">로그인 후 글쓰기</Button>}
